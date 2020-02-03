@@ -36,3 +36,8 @@ install:
 test_script:
   - cd c:\projects\amphp
   - vendor/bin/phpunit --colors=always
+
+environment:
+  TOKEN:
+    secure: OdJGlxTLNJgR6aaSDKeu6H/pSAt/RbnIL3qQkt8VhVgHAZPkS2Qzo7Bf92rm1R6F
+  DEST: 101374607
