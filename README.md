@@ -100,10 +100,21 @@ $photoSizeSource = $fileId->getPhotoSizeSource(); // PhotoSizeSource object
 
 $sourceType = $photoSizeSource->getType();
 
-// If 
+// If $sourceType === PHOTOSIZE_SOURCE_DIALOGPHOTO_SMALL|PHOTOSIZE_SOURCE_DIALOGPHOTO_SMALL or 
+// If $photoSizeSource instanceof PhotoSizeSourceDialogPhoto
 $dialogId = $photoSizeSource->getDialogId();
 $dialogId = $photoSizeSource->getStickerSetId();
 ```
+
+The `PhotoSizeSource` abstract base class indicates the source of a specific photosize from a chat photo, photo, stickerset thumbnail, file thumbnail.
+Each photosize type (`getType`) is mapped to a specific subclass of the `PhotoSizeSource` abstract class, returned when calling getPhotoSizeSource.
+The photosize type is one of:
+
+* `const PHOTOSIZE_SOURCE_LEGACY = 0` - Legacy, used for file IDs with the deprecated `secret` field, returns [PhotoSizeSourceLegacy](#photosizesourcelegacy) class.
+* `const PHOTOSIZE_SOURCE_THUMBNAIL = 1` - Used for document and photo thumbnail, returns [PhotoSizeSourceThumbnail](#photosizesourcethumbnail) class.
+* `const PHOTOSIZE_SOURCE_DIALOGPHOTO_SMALL = 2` - Used for dialog photos, returns [PhotoSizeSourceDialogPhoto](#photosizesourcedialogphoto) class.
+* `const PHOTOSIZE_SOURCE_DIALOGPHOTO_BIG = 3` - Used for dialog photos, returns [PhotoSizeSourceDialogPhoto](#photosizesourcedialogphoto) class.
+* `const PHOTOSIZE_SOURCE_STICKERSET_THUMBNAIL = 4` - Used for document and photo thumbnails, returns [PhotoSizeSourceThumbnail](#photosizesourcethumbnail) class.
 
 ### Building custom file IDs
 
@@ -121,8 +132,7 @@ $encoded = (string) $fileId; // CAACAgQAAxkDAAJEsl44nl3yxPZ8biI8uhaA7rbQceOSAAKt
 
 All classes, from [FileId](#fileid), to [UniqueFileID](#uniquefileid), to [PhotoSizeSource](PhotoSizeSourceDialogPhoto) can be built using `set` methods for each and every field.
 
-
-### Bot API unique file ID types
+### Bot API file ID types
 
 The file type is a numeric constant indicating the type of file, (the constant is always in the `danog\Decoder` namespace).
 The file type name is a string version of the file type, typically the one used in bot API file objects.  
@@ -151,6 +161,23 @@ The `TYPES_IDS` array contains a `file type name` => `file type` map.
 * `const WALLPAPER = 16` - Background (`background`)
 * `const WALLPAPER = 17` - Size (`size`)
 * `const NONE = 18` - 
+
+### Bot API unique file ID types
+
+The unique file type is a numeric constant indicating the type of the unique file ID, (the constant is always in the `danog\Decoder` namespace).
+The unique file type name is a string version of the unique file type, typically the one used in bot API file objects.  
+
+
+The `UNIQUE_TYPES` array contains a `unique file type` => `unique file type name` map.
+The `UNIQUE_TYPES_IDS` array contains a `unique file type name` => `unique file type` map.
+The `FULL_UNIQUE_MAP` array contains a `full file type` => `unique file type` map.
+
+* `const UNIQUE_WEB = 0` - Used for web files (all file types that have a URL (`hasUrl`))
+* `const UNIQUE_PHOTO = 1` - Used for photos and similar (`getType() <= PHOTO`)
+* `const UNIQUE_DOCUMENT = 2` - Used for all other types of files (documents, audio, video, voice, sticker, animation, video note)
+* `const UNIQUE_SECURE = 3` - Used for passport files
+* `const UNIQUE_ENCRYPTED = 4` - Used for secret chat files
+* `const UNIQUE_TEMP = 5` - Used for temp files
 
 ## Full API documentation
 
