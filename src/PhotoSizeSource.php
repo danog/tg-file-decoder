@@ -47,7 +47,7 @@ abstract class PhotoSizeSource
      * Get photosize source type.
      *
      * @return integer
-     * 
+     *
      * @internal Internal use
      */
     public function getType(): int

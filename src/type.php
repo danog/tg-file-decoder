@@ -18,11 +18,27 @@
 
 namespace danog\Decoder;
 
+/**
+ * Thumbnail.
+ */
 const THUMBNAIL = 0;
-const PROFILE_PHOTO = 1; // For users and channels, chat photos are normal photos
+/**
+ * Profile photo.
+ * Used for users and channels, chat photos are normal PHOTOs.
+ */
+const PROFILE_PHOTO = 1;
+/**
+ * Normal photos.
+ */
 const PHOTO = 2;
 
+/**
+ * Voice messages.
+ */
 const VOICE = 3;
+/**
+ * VIdeo messages.
+ */
 const VIDEO = 4;
 const DOCUMENT = 5;
 const ENCRYPTED = 6;

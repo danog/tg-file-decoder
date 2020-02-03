@@ -80,10 +80,10 @@ class UniqueFileId
         $fileId = \pack('V', $this->getType());
         if ($this->getType() === UNIQUE_WEB) {
             $fileId .= packTLString($this->getUrl());
-        } else if ($this->getType() === UNIQUE_PHOTO) {
+        } elseif ($this->getType() === UNIQUE_PHOTO) {
             $fileId .= packLong($this->getVolumeId());
-            $fileId .= pack('l', $this->getLocalId());
-        } else if ($this->hasId()) {
+            $fileId .= \pack('l', $this->getLocalId());
+        } elseif ($this->hasId()) {
             $fileId .= packLong($this->getId());
         }
 

@@ -10,8 +10,6 @@ use PHPUnit\Framework\TestCase;
 use const danog\Decoder\FULL_UNIQUE_MAP;
 use const danog\Decoder\TYPES_IDS;
 
-use function danog\Decoder\internalDecode;
-use function danog\Decoder\internalDecodeUnique;
 
 \define('MULTIPART_BOUNDARY', '--------------------------'.\microtime(true));
 

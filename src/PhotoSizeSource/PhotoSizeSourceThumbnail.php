@@ -57,7 +57,7 @@ class PhotoSizeSourceThumbnail extends PhotoSizeSource
         return $this->_thumbFileType;
     }
     /**
-     * Get file type of original file as string
+     * Get file type of original file as string.
      *
      * @return string
      */
