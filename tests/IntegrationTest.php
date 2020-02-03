@@ -20,7 +20,6 @@ class IntegrationTest extends TestCase
      */
     public function testAll(string $type, string $fileIdStr, string $uniqueFileIdStr)
     {
-        var_dump($fileIdStr, $uniqueFileIdStr);
         $fileId = FileId::fromBotAPI($fileIdStr);
         $this->assertSame($type, $fileId->getTypeName());
 

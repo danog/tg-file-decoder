@@ -41,55 +41,55 @@ const VOICE = 3;
  */
 const VIDEO = 4;
 /**
- * Document
+ * Document.
  */
 const DOCUMENT = 5;
 /**
- * Secret chat document
+ * Secret chat document.
  */
 const ENCRYPTED = 6;
 /**
- * Temporary document
+ * Temporary document.
  */
 const TEMP = 7;
 /**
- * Sticker
+ * Sticker.
  */
 const STICKER = 8;
 /**
- * Music
+ * Music.
  */
 const AUDIO = 9;
 /**
- * GIF
+ * GIF.
  */
 const ANIMATION = 10;
 /**
- * Encrypted thumbnail
+ * Encrypted thumbnail.
  */
 const ENCRYPTED_THUMBNAIL = 11;
 /**
- * Wallpaper
+ * Wallpaper.
  */
 const WALLPAPER = 12;
 /**
- * Round video
+ * Round video.
  */
 const VIDEO_NOTE = 13;
 /**
- * Passport raw file
+ * Passport raw file.
  */
 const SECURE_RAW = 14;
 /**
- * Passport file
+ * Passport file.
  */
 const SECURE = 15;
 /**
- * Background
+ * Background.
  */
 const BACKGROUND = 16;
 /**
- * Size
+ * Size.
  */
 const SIZE = 17;
 const NONE = 18;
