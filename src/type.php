@@ -37,21 +37,60 @@ const PHOTO = 2;
  */
 const VOICE = 3;
 /**
- * VIdeo messages.
+ * Video.
  */
 const VIDEO = 4;
+/**
+ * Document
+ */
 const DOCUMENT = 5;
+/**
+ * Secret chat document
+ */
 const ENCRYPTED = 6;
+/**
+ * Temporary document
+ */
 const TEMP = 7;
+/**
+ * Sticker
+ */
 const STICKER = 8;
+/**
+ * Music
+ */
 const AUDIO = 9;
+/**
+ * GIF
+ */
 const ANIMATION = 10;
+/**
+ * Encrypted thumbnail
+ */
 const ENCRYPTED_THUMBNAIL = 11;
+/**
+ * Wallpaper
+ */
 const WALLPAPER = 12;
+/**
+ * Round video
+ */
 const VIDEO_NOTE = 13;
+/**
+ * Passport raw file
+ */
 const SECURE_RAW = 14;
+/**
+ * Passport file
+ */
 const SECURE = 15;
+/**
+ * Background
+ */
 const BACKGROUND = 16;
+/**
+ * Size
+ */
 const SIZE = 17;
 const NONE = 18;
 

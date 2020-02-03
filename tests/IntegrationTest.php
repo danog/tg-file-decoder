@@ -10,9 +10,6 @@ use PHPUnit\Framework\TestCase;
 use const danog\Decoder\FULL_UNIQUE_MAP;
 use const danog\Decoder\TYPES_IDS;
 
-
-\define('MULTIPART_BOUNDARY', '--------------------------'.\microtime(true));
-
 class IntegrationTest extends TestCase
 {
     /**
@@ -23,6 +20,7 @@ class IntegrationTest extends TestCase
      */
     public function testAll(string $type, string $fileIdStr, string $uniqueFileIdStr)
     {
+        var_dump($fileIdStr, $uniqueFileIdStr);
         $fileId = FileId::fromBotAPI($fileIdStr);
         $this->assertSame($type, $fileId->getTypeName());
 
@@ -35,11 +33,23 @@ class IntegrationTest extends TestCase
         $this->assertSame($uniqueFileIdStr, $fileId->getUnique()->getUniqueBotAPI());
     }
 
-    public function provideFileIdsAndType(): array
+    public function provideFileIdsAndType(): \Generator
     {
-        $result = [];
         $dest = \getenv('DEST');
         $token = \getenv('TOKEN');
+        foreach ($this->provideChats() as $chat) {
+            $result = \json_decode(\file_get_contents("https://api.telegram.org/bot$token/getChat?chat_id=$chat"), true)['result']['photo'];
+            yield [
+                'profile_photo',
+                $result['small_file_id'],
+                $result['small_file_unique_id'],
+            ];
+            yield [
+                'profile_photo',
+                $result['big_file_id'],
+                $result['big_file_unique_id'],
+            ];
+        }
         foreach ($this->provideUrls() as $type => $url) {
             if ($type === 'video_note') {
                 \copy($url, \basename($url));
@@ -62,13 +72,13 @@ class IntegrationTest extends TestCase
                 $botResult = [$botResult];
             }
             foreach ($botResult as $subResult) {
-                $result []= [
+                yield [
                     $type,
                     $subResult['file_id'],
                     $subResult['file_unique_id']
                 ];
                 if (isset($subResult['thumb'])) {
-                    $result []= [
+                    yield [
                         'thumbnail',
                         $subResult['thumb']['file_id'],
                         $subResult['thumb']['file_unique_id']
@@ -77,6 +87,10 @@ class IntegrationTest extends TestCase
             }
         }
         return $result;
+    }
+    public function provideChats(): array
+    {
+        return [\getenv('DEST'), '@MadelineProto'];
     }
     public function provideUrls(): array
     {

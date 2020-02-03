@@ -241,13 +241,22 @@ class FileId
         return UniqueFileId::fromFileId($this);
     }
     /**
+     * Get unique bot API file ID from file ID.
+     *
+     * @return string
+     */
+    public function getUniqueBotAPI(): string
+    {
+        return UniqueFileId::fromFileId($this)->getUniqueBotAPI();
+    }
+    /**
      * Get bot API file ID.
      *
      * @return string
      */
     public function __toString(): string
     {
-        return $this->toBotAPI();
+        return $this->getBotAPI();
     }
     /**
      * Get bot API file ID version.
