@@ -10,7 +10,9 @@
             "email": "daniil@daniil.it"
         }
     ],
-    "require": {},
+    "require": {
+        "php": ">=7.0"
+    },
     "require-dev": {
         "phpunit/phpunit": "^8",
         "amphp/php-cs-fixer-config": "dev-master"
