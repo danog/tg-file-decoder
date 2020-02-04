@@ -55,7 +55,6 @@ class IntegrationTest extends TestCase
 
                 $handle = \curl_init("https://api.telegram.org/bot$token/sendVideoNote?chat_id=$dest");
                 \curl_setopt($handle, CURLOPT_POST, true);
-                \curl_setopt($handle, CURLOPT_VERBOSE, true);
                 \curl_setopt($handle, CURLOPT_POSTFIELDS, [
                     $type => new CURLFile(\basename($url))
                 ]);
