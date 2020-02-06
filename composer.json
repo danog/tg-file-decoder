@@ -2,7 +2,7 @@
     "name": "danog/tg-file-decoder",
     "description": "Decode Telegram bot API file IDs",
     "type": "project",
-    "license": "AGPLv3",
+    "license": "AGPL-3.0-only",
     "keywords": ["telegram", "mtproto", "bot API", "file ID", "video", "stickers", "audio", "files"],
     "authors": [
         {
