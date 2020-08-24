@@ -1,7 +1,6 @@
 # tg-file-decoder
 
-[![Build Status](https://travis-ci.org/danog/tg-file-decoder.svg?branch=master)](https://travis-ci.org/danog/tg-file-decoder) [![Build status](https://ci.appveyor.com/api/projects/status/akmq8k33ojdn5vf0?svg=true)](https://ci.appveyor.com/project/danog/tg-file-decoder)
-
+![build](https://github.com/danog/tg-file-decoder/workflows/build/badge.svg)
 
 Decode [Telegram bot API file IDs](https://core.telegram.org).
 
