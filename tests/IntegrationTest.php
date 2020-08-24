@@ -34,6 +34,14 @@ class IntegrationTest extends TestCase
 
     public function provideFileIdsAndType(): \Generator
     {
+        foreach (['CAADBAADwwADmFmqDf6xBrPTReqHFgQ', 'CAACAgQAAxkBAAIC4l9CWDGzVUcDejU0TETLWbOdfsCoAALDAAOYWaoN_rEGs9NF6ocbBA', 'CAADBAADwwADmFmqDf6xBrPTReqHAg'] as $fileId) {
+            yield [
+                'sticker',
+                $fileId,
+                'AgADwwADmFmqDQ'
+            ];
+        }
+
         $dest = \getenv('DEST');
         $token = \getenv('TOKEN');
         foreach ($this->provideChats() as $chat) {
@@ -85,7 +93,6 @@ class IntegrationTest extends TestCase
                 }
             }
         }
-        return $result;
     }
     public function provideChats(): array
     {

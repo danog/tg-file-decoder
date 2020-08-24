@@ -518,7 +518,7 @@ function internalDecode(string $fileId): array
     $l = \fstat($fileId)['size'] - \ftell($fileId);
     $l -= $result['version'] >= 4 ? 2 : 1;
     if ($l > 0) {
-        \trigger_error("Unique file ID $orig has $l bytes of leftover data");
+        \trigger_error("File ID $orig has $l bytes of leftover data");
     }
     return $result;
 }
