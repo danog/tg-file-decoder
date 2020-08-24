@@ -29,7 +29,7 @@ $subVersion = $fileId->getSubVersion(); // bot API file ID subversion, equivalen
 $dcId = $fileId->getDcId(); // On which datacenter is this file stored
 
 $type = $fileId->getType(); // File type
-$typeName = $fileId->getType(); // File type (as string)
+$typeName = $fileId->getTypeName(); // File type (as string)
 
 $id = $fileId->getId();
 $accessHash = $fileId->getAccessHash();
@@ -64,7 +64,7 @@ For photosize source, see [here](#photosize-source).
 $uniqueFileId = UniqueFileId::fromUniqueBotAPI('AgADrQEAArE4rFE');
 
 $type = $fileId->getType(); // Unique file type
-$typeName = $fileId->getType(); // Unique file type (as string)
+$typeName = $fileId->getTypeName(); // Unique file type (as string)
 
 $id = $uniqueFileId->getId();
 $accessHash = $uniqueFileId->getAccessHash();
@@ -1696,9 +1696,5 @@ UniqueFileId::hasUrl(  ): boolean
 
 
 
----
 
 
-
---------
-> This document was automatically generated from source code comments on 2020-02-03 using [phpDocumentor](http://www.phpdoc.org/) and [cvuorinen/phpdoc-markdown-public](https://github.com/cvuorinen/phpdoc-markdown-public)
