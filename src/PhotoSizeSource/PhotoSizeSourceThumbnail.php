@@ -21,6 +21,7 @@ namespace danog\Decoder\PhotoSizeSource;
 use danog\Decoder\PhotoSizeSource;
 
 use const danog\Decoder\PHOTOSIZE_SOURCE_THUMBNAIL;
+use const danog\Decoder\TYPES;
 
 /**
  * Represents source of photosize.

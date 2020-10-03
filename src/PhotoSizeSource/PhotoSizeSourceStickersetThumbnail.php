@@ -24,6 +24,8 @@ use const danog\Decoder\PHOTOSIZE_SOURCE_STICKERSET_THUMBNAIL;
 
 /**
  * Represents source of photosize.
+ *
+ * @extends PhotoSizeSource<PhotoSizeSourceStickersetThumbnail>
  */
 class PhotoSizeSourceStickersetThumbnail extends PhotoSizeSource
 {

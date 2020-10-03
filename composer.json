@@ -15,7 +15,8 @@
     },
     "require-dev": {
         "phpunit/phpunit": "^8|^6",
-        "amphp/php-cs-fixer-config": "dev-master"
+        "amphp/php-cs-fixer-config": "dev-master",
+        "vimeo/psalm": "dev-master"
     },
     "autoload": {
         "psr-4": {

@@ -25,6 +25,8 @@ use const danog\Decoder\PHOTOSIZE_SOURCE_DIALOGPHOTO_SMALL;
 
 /**
  * Represents source of photosize.
+ *
+ * @extends PhotoSizeSource<PhotoSizeSourceDialogPhoto>
  */
 class PhotoSizeSourceDialogPhoto extends PhotoSizeSource
 {

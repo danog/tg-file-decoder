@@ -18,8 +18,12 @@
 
 namespace danog\Decoder;
 
+use danog\Decoder\PhotoSizeSource\PhotoSizeSourceLegacy;
+
 /**
  * Represents source of photosize.
+ *
+ * @template T
  */
 abstract class PhotoSizeSource
 {
@@ -47,6 +51,17 @@ abstract class PhotoSizeSource
      * Get photosize source type.
      *
      * @return integer
+     *
+     * @psalm-return (
+     *     T is PhotoSizeSourceLegacy ?
+     *     ? \danog\Decoder\PHOTOSIZE_SOURCE_LEGACY
+     *     : (T is PhotoSizeSourceDialogPhoto
+     *       ? \danog\Decoder\PHOTOSIZE_SOURCE_DIALOGPHOTO_*
+     *       (T is PhotoSizeSourceStickersetThumbnail
+     *         ? \danog\Decoder\PHOTOSIZE_SOURCE_STICKERSET_THUMBNAIL
+     *         : \danog\Decoder\PHOTOSIZE_SOURCE_THUMBNAIL
+     *       )
+     *     )
      *
      * @internal Internal use
      */

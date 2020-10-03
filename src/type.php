@@ -206,6 +206,7 @@ $BIG_ENDIAN = \pack('L', 1) === \pack('N', 1);
 function unpackLong(string $field)
 {
     if (PHP_INT_SIZE === 8) {
+        /** @psalm-suppress InvalidGlobal */
         global $BIG_ENDIAN; // Evil
         return \unpack('q', $BIG_ENDIAN ? \strrev($field) : $field)[1];
     }
@@ -227,6 +228,7 @@ function unpackLong(string $field)
 function packLongBig($field): string
 {
     if (PHP_INT_SIZE === 8) {
+        /** @psalm-suppress InvalidGlobal */
         global $BIG_ENDIAN; // Evil
         $res = \pack('q', $field);
         return $BIG_ENDIAN ? \strrev($res) : $res;
@@ -263,7 +265,7 @@ function fixLong(array &$params, string $field)
 /**
  * Encode long to string.
  *
- * @param string|array $fields Fields to encode
+ * @param int|int[] $fields Fields to encode
  *
  * @return string
  */

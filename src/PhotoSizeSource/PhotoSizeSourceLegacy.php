@@ -24,6 +24,8 @@ use const danog\Decoder\PHOTOSIZE_SOURCE_LEGACY;
 
 /**
  * Represents source of photosize.
+ *
+ * @extends PhotoSizeSource<PhotoSizeSourceLegacy>
  */
 class PhotoSizeSourceLegacy extends PhotoSizeSource
 {
