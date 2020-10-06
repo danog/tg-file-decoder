@@ -265,12 +265,15 @@ function fixLong(array &$params, string $field)
 /**
  * Encode long to string.
  *
- * @param int|int[] $fields Fields to encode
+ * @param string|int|int[] $fields Fields to encode
  *
  * @return string
  */
 function packLong($fields): string
 {
+    if (\is_string($fields)) { // Already encoded, we hope
+        return $fields;
+    }
     if (PHP_INT_SIZE === 8) {
         return \pack(LONG, $fields);
     }
