@@ -8,7 +8,7 @@ jobs:
     container: shivammathur/node:bionic-${{ matrix.tag }}
     strategy:
       matrix:
-        tag: ["amd64", "i386"]
+        tag: ["amd64", "arm32v7"]
         php: ["7.0", "7.1", "7.2", "7.3", "7.4"]
     name: PHP ${{ matrix.php }} Test on ${{ matrix.tag }}
     steps:
