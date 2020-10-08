@@ -4,22 +4,21 @@ on:
   push:
 jobs:
   run:
+    container: shivammathur/node:bionic-${{ matrix.tag }}
     runs-on: ${{ matrix.os }}
     strategy:
       matrix:
         os: [ubuntu-latest]
+        tag: ["amd64", "i386"]
         php-versions: ["7.0", "7.1", "7.2", "7.3", "7.4"]
-    name: PHP ${{ matrix.php-versions }} Test on ${{ matrix.os }}
+    name: PHP ${{ matrix.php-versions }} Test on ${{ matrix.os }} ${{ matrix.tag }}
     steps:
       - name: Checkout
         uses: actions/checkout@v2
 
       - name: Setup PHP
-        uses: shivammathur/setup-php@v2
-        with:
-          php-version: ${{ matrix.php-versions }}
-          extensions: mbstring, intl, sockets
-          coverage: xdebug
+        # Inputs to manual.sh are in this order - php-versions, extensions, ini-values, coverage, tools
+        run: curl -sL https://setup-php.com/manual.sh | bash -s ${{ matrix.php }} "mbstring, intl, sockets" "memory_limit=-1" "xdebug"
 
       - name: Check environment
         run: |
