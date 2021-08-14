@@ -23,9 +23,9 @@ use danog\Decoder\PhotoSizeSource;
 /**
  * Represents source of photosize.
  *
- * @extends PhotoSizeSource<PhotoSizeSourceStickersetThumbnail>
+ * @extends PhotoSizeSource<PhotoSizeSourceStickersetThumbnailVersion>
  */
-class PhotoSizeSourceStickersetThumbnail extends PhotoSizeSource
+class PhotoSizeSourceStickersetThumbnailVersion extends PhotoSizeSource
 {
     /**
      * Stickerset ID.
@@ -39,6 +39,12 @@ class PhotoSizeSourceStickersetThumbnail extends PhotoSizeSource
      * @var int
      */
     private $_stickerSetAccessHash;
+    /**
+     * Stickerset version.
+     *
+     * @var int
+     */
+    private $_stickerSetVersion;
 
 
     /**
@@ -85,6 +91,30 @@ class PhotoSizeSourceStickersetThumbnail extends PhotoSizeSource
     public function setStickerSetAccessHash($_stickerSetAccessHash): self
     {
         $this->_stickerSetAccessHash = $_stickerSetAccessHash;
+
+        return $this;
+    }
+
+    /**
+     * Get stickerset version.
+     *
+     * @return int
+     */
+    public function getStickerSetVersion(): int
+    {
+        return $this->_stickerSetVersion;
+    }
+
+    /**
+     * Set stickerset version.
+     *
+     * @param int $_stickerSetVersion Stickerset version.
+     *
+     * @return self
+     */
+    public function setStickerSetVersion(int $_stickerSetVersion): self
+    {
+        $this->_stickerSetVersion = $_stickerSetVersion;
 
         return $this;
     }

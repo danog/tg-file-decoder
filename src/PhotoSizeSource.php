@@ -35,13 +35,11 @@ abstract class PhotoSizeSource
     private $_type;
 
     /**
-     * Get photosize source type.
+     * Set photosize source type.
      *
      * @param integer $type Type
-     *
-     * @return self
      */
-    public function setType(int $type): self
+    public function __construct(int $type)
     {
         $this->_type = $type;
 

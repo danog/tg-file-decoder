@@ -22,6 +22,7 @@ use danog\Decoder\PhotoSizeSource;
 
 use const danog\Decoder\PHOTOSIZE_SOURCE_DIALOGPHOTO_BIG;
 use const danog\Decoder\PHOTOSIZE_SOURCE_DIALOGPHOTO_SMALL;
+use const danog\Decoder\PHOTOSIZE_SOURCE_DIALOGPHOTO_SMALL_LEGACY;
 
 /**
  * Represents source of photosize.
@@ -42,14 +43,6 @@ class PhotoSizeSourceDialogPhoto extends PhotoSizeSource
      * @var int
      */
     private $_dialogAccessHash;
-
-    /**
-     * Constructor.
-     */
-    public function __construct()
-    {
-        $this->setType(PHOTOSIZE_SOURCE_DIALOGPHOTO_BIG);
-    }
 
     /**
      * Get dialog ID.
@@ -103,18 +96,6 @@ class PhotoSizeSourceDialogPhoto extends PhotoSizeSource
      */
     public function isSmallDialogPhoto(): bool
     {
-        return $this->getType() === PHOTOSIZE_SOURCE_DIALOGPHOTO_SMALL;
-    }
-
-    /**
-     * Set whether the big or small version of the photo is being used.
-     *
-     * @param bool $_dialogPhotoSmall Whether the big or small version of the photo is being used
-     *
-     * @return self
-     */
-    public function setDialogPhotoSmall(bool $_dialogPhotoSmall): self
-    {
-        return $this->setType($_dialogPhotoSmall ? PHOTOSIZE_SOURCE_DIALOGPHOTO_SMALL : PHOTOSIZE_SOURCE_DIALOGPHOTO_BIG);
+        return in_array($this->getType(), [PHOTOSIZE_SOURCE_DIALOGPHOTO_SMALL_LEGACY, PHOTOSIZE_SOURCE_DIALOGPHOTO_SMALL]);
     }
 }

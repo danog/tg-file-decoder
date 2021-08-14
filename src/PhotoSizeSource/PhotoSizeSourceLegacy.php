@@ -20,8 +20,6 @@ namespace danog\Decoder\PhotoSizeSource;
 
 use danog\Decoder\PhotoSizeSource;
 
-use const danog\Decoder\PHOTOSIZE_SOURCE_LEGACY;
-
 /**
  * Represents source of photosize.
  *
@@ -29,13 +27,6 @@ use const danog\Decoder\PHOTOSIZE_SOURCE_LEGACY;
  */
 class PhotoSizeSourceLegacy extends PhotoSizeSource
 {
-    /**
-     * Constructor.
-     */
-    public function __construct()
-    {
-        $this->setType(PHOTOSIZE_SOURCE_LEGACY);
-    }
     /**
      * Secret legacy ID.
      *

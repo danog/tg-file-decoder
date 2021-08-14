@@ -189,6 +189,11 @@ const PHOTOSIZE_SOURCE_THUMBNAIL = 1;
 const PHOTOSIZE_SOURCE_DIALOGPHOTO_SMALL = 2;
 const PHOTOSIZE_SOURCE_DIALOGPHOTO_BIG = 3;
 const PHOTOSIZE_SOURCE_STICKERSET_THUMBNAIL = 4;
+const PHOTOSIZE_SOURCE_FULL_LEGACY = 5;
+const PHOTOSIZE_SOURCE_DIALOGPHOTO_SMALL_LEGACY = 6;
+const PHOTOSIZE_SOURCE_DIALOGPHOTO_BIG_LEGACY = 7;
+const PHOTOSIZE_SOURCE_STICKERSET_THUMBNAIL_LEGACY = 8;
+const PHOTOSIZE_SOURCE_STICKERSET_THUMBNAIL_VERSION = 9;
 
 const WEB_LOCATION_FLAG =  1 << 24;
 const FILE_REFERENCE_FLAG = 1 << 25;
@@ -492,33 +497,75 @@ function internalDecode(string $fileId): array
     fixLong($result, 'access_hash');
 
     if ($result['typeId'] <= PHOTO) {
-        $result += \unpack(LONG.'volume_id', \stream_get_contents($fileId, 8));
-        fixLong($result, 'volume_id');
-        $result['secret'] = 0;
-        $result['photosize_source'] = $result['version'] >= 4 ? \unpack('V', \stream_get_contents($fileId, 4))[1] : 0;
-        // Legacy, Thumbnail, DialogPhotoSmall, DialogPhotoBig, StickerSetThumbnail
-        switch ($result['photosize_source']) {
-            case PHOTOSIZE_SOURCE_LEGACY:
-                $result += \unpack(LONG.'secret', \stream_get_contents($fileId, 8));
+        $parsePhotoSize = function () use (&$result, &$fileId): void {
+            $result['photosize_source'] = $result['subVersion'] >= 4 ? \unpack('V', \stream_get_contents($fileId, 4))[1] : 0;
+            switch ($result['photosize_source']) {
+                case PHOTOSIZE_SOURCE_LEGACY:
+                    $result += \unpack(LONG.'secret', \stream_get_contents($fileId, 8));
+                    fixLong($result, 'secret');
+                    break;
+                case PHOTOSIZE_SOURCE_THUMBNAIL:
+                    $result += \unpack('Vfile_type/athumbnail_type', \stream_get_contents($fileId, 8));
+                    break;
+                case PHOTOSIZE_SOURCE_DIALOGPHOTO_BIG:
+                case PHOTOSIZE_SOURCE_DIALOGPHOTO_SMALL:
+                    $result['photo_size'] = $result['photosize_source'] === PHOTOSIZE_SOURCE_DIALOGPHOTO_SMALL ? 'photo_small' : 'photo_big';
+                    $result['dialog_id'] = unpackLong(\stream_get_contents($fileId, 8));
+                    $result['dialog_access_hash'] = \unpack(LONG, \stream_get_contents($fileId, 8))[1];
+                    fixLong($result, 'dialog_access_hash');
+                    break;
+                case PHOTOSIZE_SOURCE_STICKERSET_THUMBNAIL:
+                    $result += \unpack(LONG.'sticker_set_id/'.LONG.'sticker_set_access_hash', \stream_get_contents($fileId, 16));
+                    fixLong($result, 'sticker_set_id');
+                    fixLong($result, 'sticker_set_access_hash');
+                    break;
+
+                case PHOTOSIZE_SOURCE_FULL_LEGACY:
+                    $result += \unpack(LONG.'volume_id/'.LONG.'secret/llocal_id', \stream_get_contents($fileId, 20));
+                    fixLong($result, 'volume_id');
+                    fixLong($result, 'secret');
+                    break;
+                case PHOTOSIZE_SOURCE_DIALOGPHOTO_BIG_LEGACY:
+                case PHOTOSIZE_SOURCE_DIALOGPHOTO_SMALL_LEGACY:
+                    $result['photo_size'] = $result['photosize_source'] === PHOTOSIZE_SOURCE_DIALOGPHOTO_SMALL_LEGACY ? 'photo_small' : 'photo_big';
+                    $result['dialog_id'] = unpackLong(\stream_get_contents($fileId, 8));
+                    $result['dialog_access_hash'] = \unpack(LONG, \stream_get_contents($fileId, 8))[1];
+                    fixLong($result, 'dialog_access_hash');
+
+                    $result += \unpack(LONG.'volume_id/llocal_id', \stream_get_contents($fileId, 12));
+                    fixLong($result, 'volume_id');
+                    break;
+                case PHOTOSIZE_SOURCE_STICKERSET_THUMBNAIL_LEGACY:
+                    $result += \unpack(LONG.'sticker_set_id/'.LONG.'sticker_set_access_hash', \stream_get_contents($fileId, 16));
+                    fixLong($result, 'sticker_set_id');
+                    fixLong($result, 'sticker_set_access_hash');
+
+                    $result += \unpack(LONG.'volume_id/llocal_id', \stream_get_contents($fileId, 12));
+                    fixLong($result, 'volume_id');
+                    break;
+
+                case PHOTOSIZE_SOURCE_STICKERSET_THUMBNAIL_VERSION:
+                    $result += \unpack(LONG.'sticker_set_id/'.LONG.'sticker_set_access_hash/lsticker_version', \stream_get_contents($fileId, 20));
+                    fixLong($result, 'sticker_set_id');
+                    fixLong($result, 'sticker_set_access_hash');
+                    break;
+            }
+        };
+        if ($result['subVersion'] >= 32) {
+            $parsePhotoSize();
+        } else {
+            $result += \unpack(LONG.'volume_id', \stream_get_contents($fileId, 8));
+            fixLong($result, 'volume_id');
+
+            if ($result['subVersion'] >= 22) {
+                $parsePhotoSize();
+                $result += \unpack('llocal_id', \stream_get_contents($fileId, 4));
+            } else {
+                $result += \unpack(LONG.'secret/llocal_id', \stream_get_contents($fileId, 12));
+                fixLong($result, 'volume_id');
                 fixLong($result, 'secret');
-                break;
-            case PHOTOSIZE_SOURCE_THUMBNAIL:
-                $result += \unpack('Vfile_type/athumbnail_type', \stream_get_contents($fileId, 8));
-                break;
-            case PHOTOSIZE_SOURCE_DIALOGPHOTO_BIG:
-            case PHOTOSIZE_SOURCE_DIALOGPHOTO_SMALL:
-                $result['photo_size'] = $result['photosize_source'] === PHOTOSIZE_SOURCE_DIALOGPHOTO_SMALL ? 'photo_small' : 'photo_big';
-                $result['dialog_id'] = unpackLong(\stream_get_contents($fileId, 8));
-                $result['dialog_access_hash'] = \unpack(LONG, \stream_get_contents($fileId, 8))[1];
-                fixLong($result, 'dialog_access_hash');
-                break;
-            case PHOTOSIZE_SOURCE_STICKERSET_THUMBNAIL:
-                $result += \unpack(LONG.'sticker_set_id/'.LONG.'sticker_set_access_hash', \stream_get_contents($fileId, 16));
-                fixLong($result, 'sticker_set_id');
-                fixLong($result, 'sticker_set_access_hash');
-                break;
+            }
         }
-        $result += \unpack('llocal_id', \stream_get_contents($fileId, 4));
     }
     $l = \fstat($fileId)['size'] - \ftell($fileId);
     $l -= $result['version'] >= 4 ? 2 : 1;
@@ -560,15 +607,31 @@ function internalDecodeUnique(string $fileId): array
 
         $l = \fstat($fileId)['size'] - \ftell($fileId);
     } elseif (\strlen($fileId) === 12) {
+        // Legacy photos
         $result += \unpack(LONG.'volume_id/llocal_id', $fileId);
         fixLong($result, 'volume_id');
 
         $l = 0;
-    } else {
+    } elseif (\strlen($fileId) === 9) {
+        // Dialog photos/thumbnails
+        $result += \unpack(LONG.'id/CsubType', $fileId);
+        fixLong($result, 'id');
+
+        $l = 0;
+    } elseif (\strlen($fileId) === 13) {
+        // Stickerset ID/version
+        $result += \unpack('CsubType/'.LONG.'sticker_set_id/lsticker_set_version', $fileId);
+        fixLong($result, 'sticker_set_id');
+
+        $l = 0;
+    } elseif (\strlen($fileId) === 8) {
+        // Any other document
         $result += \unpack(LONG.'id', $fileId);
         fixLong($result, 'id');
 
-        $l = \strlen($fileId) - 8;
+        $l = 0;
+    } else {
+        $l = strlen($fileId);
     }
     if ($l > 0) {
         \trigger_error("Unique file ID $orig has $l bytes of leftover data");

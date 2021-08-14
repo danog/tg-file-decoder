@@ -21,6 +21,7 @@ namespace danog\Decoder;
 use danog\Decoder\PhotoSizeSource\PhotoSizeSourceDialogPhoto;
 use danog\Decoder\PhotoSizeSource\PhotoSizeSourceLegacy;
 use danog\Decoder\PhotoSizeSource\PhotoSizeSourceStickersetThumbnail;
+use danog\Decoder\PhotoSizeSource\PhotoSizeSourceStickersetThumbnailVersion;
 use danog\Decoder\PhotoSizeSource\PhotoSizeSourceThumbnail;
 
 /**
@@ -137,29 +138,42 @@ class FileId
         $result->setId($resultArray['id']);
 
         if ($result->getType() <= PHOTO) {
-            $result->setVolumeId($resultArray['volume_id']);
-            $result->setLocalId($resultArray['local_id']);
+            if (isset($resultArray['volume_id'])) {
+                $result->setVolumeId($resultArray['volume_id']);
+            }
+            if (isset($resultArray['local_id'])) {
+                $result->setLocalId($resultArray['local_id']);
+            }
             switch ($resultArray['photosize_source']) {
                 case PHOTOSIZE_SOURCE_LEGACY:
-                    $photoSizeSource = new PhotoSizeSourceLegacy;
+                case PHOTOSIZE_SOURCE_FULL_LEGACY:
+                    $photoSizeSource = new PhotoSizeSourceLegacy($resultArray['photosize_source']);
                     $photoSizeSource->setSecret($resultArray['secret']);
                     break;
                 case PHOTOSIZE_SOURCE_THUMBNAIL:
-                    $photoSizeSource = new PhotoSizeSourceThumbnail;
+                    $photoSizeSource = new PhotoSizeSourceThumbnail($resultArray['photosize_source']);
                     $photoSizeSource->setThumbType($resultArray['thumbnail_type']);
                     $photoSizeSource->setThumbFileType($resultArray['file_type']);
                     break;
-                case PHOTOSIZE_SOURCE_DIALOGPHOTO_SMALL:
+                case PHOTOSIZE_SOURCE_DIALOGPHOTO_BIG_LEGACY:
+                case PHOTOSIZE_SOURCE_DIALOGPHOTO_SMALL_LEGACY:
                 case PHOTOSIZE_SOURCE_DIALOGPHOTO_BIG:
-                    $photoSizeSource = new PhotoSizeSourceDialogPhoto;
-                    $photoSizeSource->setDialogPhotoSmall($resultArray['photosize_source'] === PHOTOSIZE_SOURCE_DIALOGPHOTO_SMALL);
+                case PHOTOSIZE_SOURCE_DIALOGPHOTO_SMALL:
+                    $photoSizeSource = new PhotoSizeSourceDialogPhoto($resultArray['photosize_source']);
                     $photoSizeSource->setDialogId($resultArray['dialog_id']);
                     $photoSizeSource->setDialogAccessHash($resultArray['dialog_access_hash']);
                     break;
                 case PHOTOSIZE_SOURCE_STICKERSET_THUMBNAIL:
-                    $photoSizeSource = new PhotoSizeSourceStickersetThumbnail;
+                case PHOTOSIZE_SOURCE_STICKERSET_THUMBNAIL_LEGACY:
+                    $photoSizeSource = new PhotoSizeSourceStickersetThumbnail($resultArray['photosize_source']);
                     $photoSizeSource->setStickerSetId($resultArray['sticker_set_id']);
                     $photoSizeSource->setStickerSetAccessHash($resultArray['sticker_set_access_hash']);
+                    break;
+                case PHOTOSIZE_SOURCE_STICKERSET_THUMBNAIL_VERSION:
+                    $photoSizeSource = new PhotoSizeSourceStickersetThumbnailVersion($resultArray['photosize_source']);
+                    $photoSizeSource->setStickerSetId($resultArray['sticker_set_id']);
+                    $photoSizeSource->setStickerSetAccessHash($resultArray['sticker_set_access_hash']);
+                    $photoSizeSource->setStickerSetVersion($resultArray['sticker_version']);
                     break;
             }
             $result->setPhotoSizeSource($photoSizeSource);
@@ -198,29 +212,42 @@ class FileId
         $fileId .= packLong($this->getAccessHash());
 
         if ($this->getType() <= PHOTO) {
-            $fileId .= packLong($this->getVolumeId());
             $photoSize = $this->getPhotoSizeSource();
-            if ($this->getVersion() >= 4) {
-                $fileId .= \pack('V', $photoSize->getType());
-            }
+            $fileId .= \pack('V', $photoSize->getType());
             switch ($photoSize->getType()) {
                 case PHOTOSIZE_SOURCE_LEGACY:
                     $fileId .= packLong($photoSize->getSecret());
+                    break;
+                case PHOTOSIZE_SOURCE_FULL_LEGACY:
+                    $fileId .= packLong($this->getVolumeId());
+                    $fileId .= packLong($photoSize->getSecret());
+                    $fileId .= pack('l',$this->getLocalId());
                     break;
                 case PHOTOSIZE_SOURCE_THUMBNAIL:
                     $fileId .= \pack('Va4', $photoSize->getThumbFileType(), $photoSize->getThumbType());
                     break;
                 case PHOTOSIZE_SOURCE_DIALOGPHOTO_BIG:
                 case PHOTOSIZE_SOURCE_DIALOGPHOTO_SMALL:
+                case PHOTOSIZE_SOURCE_DIALOGPHOTO_BIG_LEGACY:
+                case PHOTOSIZE_SOURCE_DIALOGPHOTO_SMALL_LEGACY:
                     $fileId .= packLongBig($photoSize->getDialogId());
                     $fileId .= packLong($photoSize->getDialogAccessHash());
                     break;
                 case PHOTOSIZE_SOURCE_STICKERSET_THUMBNAIL:
+                case PHOTOSIZE_SOURCE_STICKERSET_THUMBNAIL_LEGACY:
                     $fileId .= packLong($photoSize->getStickerSetId());
                     $fileId .= packLong($photoSize->getStickerSetAccessHash());
                     break;
+                case PHOTOSIZE_SOURCE_STICKERSET_THUMBNAIL_VERSION:
+                    $fileId .= packLong($photoSize->getStickerSetId());
+                    $fileId .= packLong($photoSize->getStickerSetAccessHash());
+                    $fileId .= pack('l', $photoSize->getStickerSetVersion());
+                    break;
             }
-            $fileId .= \pack('l', $this->getLocalId());
+            if ($photoSize->getType() >= PHOTOSIZE_SOURCE_DIALOGPHOTO_SMALL_LEGACY && $photoSize->getType() <= PHOTOSIZE_SOURCE_STICKERSET_THUMBNAIL_LEGACY) {
+                $fileId .= packLong($this->getVolumeId());
+                $fileId .= \pack('l', $this->getLocalId());
+            }
         }
 
         if ($this->getVersion() >= 4) {

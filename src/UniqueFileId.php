@@ -18,6 +18,10 @@
 
 namespace danog\Decoder;
 
+use danog\Decoder\PhotoSizeSource\PhotoSizeSourceDialogPhoto;
+use danog\Decoder\PhotoSizeSource\PhotoSizeSourceStickersetThumbnailVersion;
+use danog\Decoder\PhotoSizeSource\PhotoSizeSourceThumbnail;
+
 /**
  * Represents decoded unique bot API file ID.
  */
@@ -47,6 +51,24 @@ class UniqueFileId
      * @var int
      */
     private $_localId;
+    /**
+     * Photo subtype
+     *
+     * @var int
+     */
+    private $_subType;
+    /**
+     * Sticker set ID
+     *
+     * @var int
+     */
+    private $_stickerSetId;
+    /**
+     * Sticker set version
+     *
+     * @var int
+     */
+    private $_stickerSetVersion;
     /**
      * Weblocation URL.
      *
@@ -81,8 +103,17 @@ class UniqueFileId
         if ($this->getType() === UNIQUE_WEB) {
             $fileId .= packTLString($this->getUrl());
         } elseif ($this->getType() === UNIQUE_PHOTO) {
-            $fileId .= packLong($this->getVolumeId());
-            $fileId .= \pack('l', $this->getLocalId());
+            if ($this->hasVolumeId()) {
+                $fileId .= packLong($this->getVolumeId());
+                $fileId .= \pack('l', $this->getLocalId());
+            } elseif ($this->hasStickerSetId()) {
+                $fileId .= chr($this->getSubType());
+                $fileId .= packLong($this->getStickerSetId());
+                $fileId .= pack('l', $this->getStickerSetVersion());
+            } else {
+                $fileId .= packLong($this->getId());
+                $fileId .= chr($this->getSubType());
+            }
         } elseif ($this->hasId()) {
             $fileId .= packLong($this->getId());
         }
@@ -105,8 +136,17 @@ class UniqueFileId
         if ($result->getType() === UNIQUE_WEB) {
             $result->setUrl($resultArray['url']);
         } elseif ($result->getType() === UNIQUE_PHOTO) {
-            $result->setVolumeId($resultArray['volume_id']);
-            $result->setLocalId($resultArray['local_id']);
+            if (isset($resultArray['volume_id'])) {
+                $result->setVolumeId($resultArray['volume_id']);
+                $result->setLocalId($resultArray['local_id']);
+            } else if (isset($resultArray['id'])) {
+                $result->setId($resultArray['id']);
+                $result->setSubType($resultArray['subType']);
+            } else if (isset($resultArray['sticker_set_id'])) {
+                $result->setStickerSetId($resultArray['sticker_set_id']);
+                $result->setStickerSetVersion($resultArray['sticker_set_version']);
+                $result->setSubType($resultArray['subType']);
+            }
         } elseif (isset($resultArray['id'])) {
             $result->setId($resultArray['id']);
         }
@@ -143,8 +183,30 @@ class UniqueFileId
         if ($result->getType() === UNIQUE_WEB) {
             $result->setUrl($fileId->getUrl());
         } elseif ($result->getType() === UNIQUE_PHOTO) {
-            $result->setVolumeId($fileId->getVolumeId());
-            $result->setLocalId($fileId->getLocalId());
+            if ($fileId->hasVolumeId()) {
+                $result->setVolumeId($fileId->getVolumeId());
+                $result->setLocalId($fileId->getLocalId());
+            } else if ($fileId->hasId()) {
+                $result->setId($fileId->getId());
+                $photoSize = $fileId->getPhotoSizeSource();
+                if ($photoSize instanceof PhotoSizeSourceThumbnail) {
+                    $type = $photoSize->getThumbType();
+                    if ($type === 'a') {
+                        $type = chr(0);
+                    } else if ($type === 'c') {
+                        $type = chr(1);
+                    } else {
+                        $type = chr(ord($type)+5);
+                    }
+                    $result->setSubType(ord($type));
+                } else if ($photoSize instanceof PhotoSizeSourceDialogPhoto) {
+                    $result->setSubType($photoSize->isSmallDialogPhoto() ? 0 : 1);
+                } else if ($photoSize instanceof PhotoSizeSourceStickersetThumbnailVersion) {
+                    $result->setSubType(2);
+                    $result->setStickerSetId($photoSize->getStickerSetId());
+                    $result->setStickerSetVersion($photoSize->getStickerSetVersion());
+                }
+            }
         } elseif ($fileId->hasId()) {
             $result->setId($fileId->getId());
         }
@@ -321,5 +383,108 @@ class UniqueFileId
     public function hasUrl(): bool
     {
         return isset($this->_url);
+    }
+
+    /**
+     * Get photo subtype
+     *
+     * @return int
+     */
+    public function getSubType(): int
+    {
+        return $this->_subType;
+    }
+
+    /**
+     * Has photo subtype?
+     *
+     * @return bool
+     */
+    public function hasSubType(): bool
+    {
+        return isset($this->_subType);
+    }
+
+    /**
+     * Set photo subtype
+     *
+     * @param int $_subType Photo subtype
+     *
+     * @return self
+     */
+    public function setSubType(int $_subType): self
+    {
+        $this->_subType = $_subType;
+
+        return $this;
+    }
+
+    /**
+     * Get sticker set ID
+     *
+     * @return int
+     */
+    public function getStickerSetId()
+    {
+        return $this->_stickerSetId;
+    }
+
+
+    /**
+     * Has sticker set ID?
+     *
+     * @return bool
+     */
+    public function hasStickerSetId(): bool
+    {
+        return isset($this->_stickerSetId);
+    }
+
+    /**
+     * Set sticker set ID
+     *
+     * @param int $_stickerSetId Sticker set ID
+     *
+     * @return self
+     */
+    public function setStickerSetId($_stickerSetId): self
+    {
+        $this->_stickerSetId = $_stickerSetId;
+
+        return $this;
+    }
+
+    /**
+     * Get sticker set version
+     *
+     * @return int
+     */
+    public function getStickerSetVersion(): int
+    {
+        return $this->_stickerSetVersion;
+    }
+
+    /**
+     * Has sticker set version
+     *
+     * @return bool
+     */
+    public function hasStickerSetVersion(): bool
+    {
+        return isset($this->_stickerSetVersion);
+    }
+
+    /**
+     * Set sticker set version
+     *
+     * @param int $_stickerSetVersion Sticker set version
+     *
+     * @return self
+     */
+    public function setStickerSetVersion(int $_stickerSetVersion): self
+    {
+        $this->_stickerSetVersion = $_stickerSetVersion;
+
+        return $this;
     }
 }

@@ -20,7 +20,6 @@ namespace danog\Decoder\PhotoSizeSource;
 
 use danog\Decoder\PhotoSizeSource;
 
-use const danog\Decoder\PHOTOSIZE_SOURCE_THUMBNAIL;
 use const danog\Decoder\TYPES;
 
 /**
@@ -28,13 +27,6 @@ use const danog\Decoder\TYPES;
  */
 class PhotoSizeSourceThumbnail extends PhotoSizeSource
 {
-    /**
-     * Constructor.
-     */
-    public function __construct()
-    {
-        $this->setType(PHOTOSIZE_SOURCE_THUMBNAIL);
-    }
     /**
      * File type of original file.
      *
