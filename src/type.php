@@ -497,7 +497,7 @@ function internalDecode(string $fileId): array
     fixLong($result, 'access_hash');
 
     if ($result['typeId'] <= PHOTO) {
-        $parsePhotoSize = function () use (&$result, &$fileId): void {
+        $parsePhotoSize = function () use (&$result, &$fileId) {
             $result['photosize_source'] = $result['subVersion'] >= 4 ? \unpack('V', \stream_get_contents($fileId, 4))[1] : 0;
             switch ($result['photosize_source']) {
                 case PHOTOSIZE_SOURCE_LEGACY:
