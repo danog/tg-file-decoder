@@ -631,7 +631,7 @@ function internalDecodeUnique(string $fileId): array
 
         $l = 0;
     } else {
-        $l = strlen($fileId);
+        $l = \strlen($fileId);
     }
     if ($l > 0) {
         \trigger_error("Unique file ID $orig has $l bytes of leftover data");

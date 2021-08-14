@@ -221,7 +221,7 @@ class FileId
                 case PHOTOSIZE_SOURCE_FULL_LEGACY:
                     $fileId .= packLong($this->getVolumeId());
                     $fileId .= packLong($photoSize->getSecret());
-                    $fileId .= pack('l',$this->getLocalId());
+                    $fileId .= \pack('l', $this->getLocalId());
                     break;
                 case PHOTOSIZE_SOURCE_THUMBNAIL:
                     $fileId .= \pack('Va4', $photoSize->getThumbFileType(), $photoSize->getThumbType());
@@ -241,7 +241,7 @@ class FileId
                 case PHOTOSIZE_SOURCE_STICKERSET_THUMBNAIL_VERSION:
                     $fileId .= packLong($photoSize->getStickerSetId());
                     $fileId .= packLong($photoSize->getStickerSetAccessHash());
-                    $fileId .= pack('l', $photoSize->getStickerSetVersion());
+                    $fileId .= \pack('l', $photoSize->getStickerSetVersion());
                     break;
             }
             if ($photoSize->getType() >= PHOTOSIZE_SOURCE_DIALOGPHOTO_SMALL_LEGACY && $photoSize->getType() <= PHOTOSIZE_SOURCE_STICKERSET_THUMBNAIL_LEGACY) {

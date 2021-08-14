@@ -52,19 +52,19 @@ class UniqueFileId
      */
     private $_localId;
     /**
-     * Photo subtype
+     * Photo subtype.
      *
      * @var int
      */
     private $_subType;
     /**
-     * Sticker set ID
+     * Sticker set ID.
      *
      * @var int
      */
     private $_stickerSetId;
     /**
-     * Sticker set version
+     * Sticker set version.
      *
      * @var int
      */
@@ -107,12 +107,12 @@ class UniqueFileId
                 $fileId .= packLong($this->getVolumeId());
                 $fileId .= \pack('l', $this->getLocalId());
             } elseif ($this->hasStickerSetId()) {
-                $fileId .= chr($this->getSubType());
+                $fileId .= \chr($this->getSubType());
                 $fileId .= packLong($this->getStickerSetId());
-                $fileId .= pack('l', $this->getStickerSetVersion());
+                $fileId .= \pack('l', $this->getStickerSetVersion());
             } else {
                 $fileId .= packLong($this->getId());
-                $fileId .= chr($this->getSubType());
+                $fileId .= \chr($this->getSubType());
             }
         } elseif ($this->hasId()) {
             $fileId .= packLong($this->getId());
@@ -139,10 +139,10 @@ class UniqueFileId
             if (isset($resultArray['volume_id'])) {
                 $result->setVolumeId($resultArray['volume_id']);
                 $result->setLocalId($resultArray['local_id']);
-            } else if (isset($resultArray['id'])) {
+            } elseif (isset($resultArray['id'])) {
                 $result->setId($resultArray['id']);
                 $result->setSubType($resultArray['subType']);
-            } else if (isset($resultArray['sticker_set_id'])) {
+            } elseif (isset($resultArray['sticker_set_id'])) {
                 $result->setStickerSetId($resultArray['sticker_set_id']);
                 $result->setStickerSetVersion($resultArray['sticker_set_version']);
                 $result->setSubType($resultArray['subType']);
@@ -186,22 +186,22 @@ class UniqueFileId
             if ($fileId->hasVolumeId()) {
                 $result->setVolumeId($fileId->getVolumeId());
                 $result->setLocalId($fileId->getLocalId());
-            } else if ($fileId->hasId()) {
+            } elseif ($fileId->hasId()) {
                 $result->setId($fileId->getId());
                 $photoSize = $fileId->getPhotoSizeSource();
                 if ($photoSize instanceof PhotoSizeSourceThumbnail) {
                     $type = $photoSize->getThumbType();
                     if ($type === 'a') {
-                        $type = chr(0);
-                    } else if ($type === 'c') {
-                        $type = chr(1);
+                        $type = \chr(0);
+                    } elseif ($type === 'c') {
+                        $type = \chr(1);
                     } else {
-                        $type = chr(ord($type)+5);
+                        $type = \chr(\ord($type)+5);
                     }
-                    $result->setSubType(ord($type));
-                } else if ($photoSize instanceof PhotoSizeSourceDialogPhoto) {
+                    $result->setSubType(\ord($type));
+                } elseif ($photoSize instanceof PhotoSizeSourceDialogPhoto) {
                     $result->setSubType($photoSize->isSmallDialogPhoto() ? 0 : 1);
-                } else if ($photoSize instanceof PhotoSizeSourceStickersetThumbnailVersion) {
+                } elseif ($photoSize instanceof PhotoSizeSourceStickersetThumbnailVersion) {
                     $result->setSubType(2);
                     $result->setStickerSetId($photoSize->getStickerSetId());
                     $result->setStickerSetVersion($photoSize->getStickerSetVersion());
@@ -386,7 +386,7 @@ class UniqueFileId
     }
 
     /**
-     * Get photo subtype
+     * Get photo subtype.
      *
      * @return int
      */
@@ -406,7 +406,7 @@ class UniqueFileId
     }
 
     /**
-     * Set photo subtype
+     * Set photo subtype.
      *
      * @param int $_subType Photo subtype
      *
@@ -420,7 +420,7 @@ class UniqueFileId
     }
 
     /**
-     * Get sticker set ID
+     * Get sticker set ID.
      *
      * @return int
      */
@@ -441,7 +441,7 @@ class UniqueFileId
     }
 
     /**
-     * Set sticker set ID
+     * Set sticker set ID.
      *
      * @param int $_stickerSetId Sticker set ID
      *
@@ -455,7 +455,7 @@ class UniqueFileId
     }
 
     /**
-     * Get sticker set version
+     * Get sticker set version.
      *
      * @return int
      */
@@ -465,7 +465,7 @@ class UniqueFileId
     }
 
     /**
-     * Has sticker set version
+     * Has sticker set version.
      *
      * @return bool
      */
@@ -475,7 +475,7 @@ class UniqueFileId
     }
 
     /**
-     * Set sticker set version
+     * Set sticker set version.
      *
      * @param int $_stickerSetVersion Sticker set version
      *
