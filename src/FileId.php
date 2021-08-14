@@ -41,7 +41,7 @@ class FileId
      *
      * @var int
      */
-    private $_subVersion = 30;
+    private $_subVersion = 32;
 
     /**
      * DC ID.
