@@ -132,7 +132,7 @@ class FileId
             $result->setFileReference($resultArray['fileReference']);
         }
         if ($resultArray['hasWebLocation']) {
-            $result->setUrl($resultArray['webLocation']);
+            $result->setUrl($resultArray['url']);
             return $result;
         }
         $result->setId($resultArray['id']);
