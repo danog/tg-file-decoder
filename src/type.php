@@ -474,7 +474,7 @@ function internalDecode(string $fileId): array
     $result['typeId'] &= ~FILE_REFERENCE_FLAG;
     $result['typeId'] &= ~WEB_LOCATION_FLAG;
     if (!isset(TYPES[$result['typeId']])) {
-        throw new \InvalidArgumentException("Invalid file type provided: ${result['typeId']}");
+        throw new \InvalidArgumentException("Invalid file type provided: {$result['typeId']}");
     }
     $result['type'] = TYPES[$result['typeId']];
     $res = \fopen('php://memory', 'rw+b');
@@ -593,7 +593,7 @@ function internalDecodeUnique(string $fileId): array
 
     $result = \unpack('VtypeId', $fileId);
     if (!isset(UNIQUE_TYPES[$result['typeId']])) {
-        throw new \InvalidArgumentException("Invalid file type provided: ${result['typeId']}");
+        throw new \InvalidArgumentException("Invalid file type provided: {$result['typeId']}");
     }
     $result['type'] = UNIQUE_TYPES[$result['typeId']];
 
