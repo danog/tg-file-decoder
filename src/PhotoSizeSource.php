@@ -31,18 +31,16 @@ abstract class PhotoSizeSource
      * Source type.
      *
      */
-    private int $type;
+    private PhotoSizeSourceType $type;
 
     /**
      * Set photosize source type.
      *
-     * @param integer $type Type
+     * @param PhotoSizeSourceType $type Type
      */
-    public function __construct(int $type)
+    public function __construct(PhotoSizeSourceType $type)
     {
         $this->type = $type;
-
-        return $this;
     }
     /**
      * Get photosize source type.
@@ -51,18 +49,18 @@ abstract class PhotoSizeSource
      *
      * @psalm-return (
      *     T is PhotoSizeSourceLegacy ?
-     *     ? \danog\Decoder\PHOTOSIZE_SOURCE_LEGACY
+     *     ? \danog\Decoder\PhotoSizeSourceType::LEGACY
      *     : (T is PhotoSizeSourceDialogPhoto
-     *       ? \danog\Decoder\PHOTOSIZE_SOURCE_DIALOGPHOTO_*
+     *       ? \danog\Decoder\PhotoSizeSourceType::DIALOGPHOTO_*
      *       (T is PhotoSizeSourceStickersetThumbnail
-     *         ? \danog\Decoder\PHOTOSIZE_SOURCE_STICKERSET_THUMBNAIL
-     *         : \danog\Decoder\PHOTOSIZE_SOURCE_THUMBNAIL
+     *         ? \danog\Decoder\PhotoSizeSourceType::STICKERSET_THUMBNAIL
+     *         : \danog\Decoder\PhotoSizeSourceType::THUMBNAIL
      *       )
      *     )
      *
      * @internal Internal use
      */
-    public function getType(): int
+    public function getType(): PhotoSizeSourceType
     {
         return $this->type;
     }

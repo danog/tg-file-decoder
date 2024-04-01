@@ -24,14 +24,16 @@ use danog\Decoder\PhotoSizeSource\PhotoSizeSourceThumbnail;
 
 /**
  * Represents decoded unique bot API file ID.
+ *
+ * @api
  */
-class UniqueFileId
+final class UniqueFileId
 {
     /**
      * File type.
      *
      */
-    private int $type = NONE;
+    private UniqueFileIdType $type;
     /**
      * File ID.
      *
@@ -90,9 +92,9 @@ class UniqueFileId
     public function getUniqueBotAPI(): string
     {
         $fileId = \pack('V', $this->getType());
-        if ($this->getType() === UNIQUE_WEB) {
+        if ($this->getType() === UniqueFileIdType::WEB) {
             $fileId .= packTLString($this->getUrl());
-        } elseif ($this->getType() === UNIQUE_PHOTO) {
+        } elseif ($this->getType() === UniqueFileIdType::PHOTO) {
             if ($this->hasVolumeId()) {
                 $fileId .= packLong($this->getVolumeId());
                 $fileId .= \pack('l', $this->getLocalId());
@@ -122,9 +124,9 @@ class UniqueFileId
         $result = new self();
         $resultArray = internalDecodeUnique($fileId);
         $result->setType($resultArray['typeId']);
-        if ($result->getType() === UNIQUE_WEB) {
+        if ($result->getType() === UniqueFileIdType::WEB) {
             $result->setUrl($resultArray['url']);
-        } elseif ($result->getType() === UNIQUE_PHOTO) {
+        } elseif ($result->getType() === UniqueFileIdType::PHOTO) {
             if (isset($resultArray['volume_id'])) {
                 $result->setVolumeId($resultArray['volume_id']);
                 $result->setLocalId($resultArray['local_id']);
@@ -163,13 +165,13 @@ class UniqueFileId
     public static function fromFileId(FileId $fileId): self
     {
         $result = new self();
-        $result->setType(FULL_UNIQUE_MAP[$fileId->getType()]);
+        $result->setType($fileId->getType()->toUnique());
         if ($result->hasUrl()) {
-            $result->setType(UNIQUE_WEB);
+            $result->setType(UniqueFileIdType::WEB);
         }
-        if ($result->getType() === UNIQUE_WEB) {
+        if ($result->getType() === UniqueFileIdType::WEB) {
             $result->setUrl($fileId->getUrl());
-        } elseif ($result->getType() === UNIQUE_PHOTO) {
+        } elseif ($result->getType() === UniqueFileIdType::PHOTO) {
             if ($fileId->hasVolumeId()) {
                 $result->setVolumeId($fileId->getVolumeId());
                 $result->setLocalId($fileId->getLocalId());
@@ -202,19 +204,10 @@ class UniqueFileId
     }
 
     /**
-     * Get unique file type as string.
-     *
-     */
-    public function getTypeName(): string
-    {
-        return UNIQUE_TYPES[$this->type];
-    }
-
-    /**
      * Get unique file type.
      *
      */
-    public function getType(): int
+    public function getType(): UniqueFileIdType
     {
         return $this->type;
     }
@@ -222,10 +215,10 @@ class UniqueFileId
     /**
      * Set file type.
      *
-     * @param int $type File type.
+     * @param UniqueFileIdType $type File type.
      *
      */
-    public function setType(int $type): self
+    public function setType(UniqueFileIdType $type): self
     {
         $this->type = $type;
 

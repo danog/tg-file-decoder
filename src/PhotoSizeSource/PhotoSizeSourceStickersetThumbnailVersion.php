@@ -23,9 +23,11 @@ use danog\Decoder\PhotoSizeSource;
 /**
  * Represents source of photosize.
  *
+ * @api
+ *
  * @extends PhotoSizeSource<PhotoSizeSourceStickersetThumbnailVersion>
  */
-class PhotoSizeSourceStickersetThumbnailVersion extends PhotoSizeSource
+final class PhotoSizeSourceStickersetThumbnailVersion extends PhotoSizeSource
 {
     /**
      * Stickerset ID.

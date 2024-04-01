@@ -18,20 +18,23 @@
 
 namespace danog\Decoder\PhotoSizeSource;
 
+use danog\Decoder\FileIdType;
 use danog\Decoder\PhotoSizeSource;
-
-use const danog\Decoder\TYPES;
 
 /**
  * Represents source of photosize.
+ *
+ * @api
+ *
+ * @extends PhotoSizeSource<PhotoSizeSourceThumbnail>
  */
-class PhotoSizeSourceThumbnail extends PhotoSizeSource
+final class PhotoSizeSourceThumbnail extends PhotoSizeSource
 {
     /**
      * File type of original file.
      *
      */
-    private int $thumbFileType;
+    private FileIdType $thumbFileType;
     /**
      * Thumbnail size.
      *
@@ -42,26 +45,17 @@ class PhotoSizeSourceThumbnail extends PhotoSizeSource
      * Get file type of original file.
      *
      */
-    public function getThumbFileType(): int
+    public function getThumbFileType(): FileIdType
     {
         return $this->thumbFileType;
     }
     /**
-     * Get file type of original file as string.
-     *
-     */
-    public function getThumbFileTypeString(): string
-    {
-        return TYPES[$this->thumbFileType];
-    }
-
-    /**
      * Set file type of original file.
      *
-     * @param int $thumbFileType File type of original file
+     * @param FileIdType $thumbFileType File type of original file
      *
      */
-    public function setThumbFileType(int $thumbFileType): self
+    public function setThumbFileType(FileIdType $thumbFileType): self
     {
         $this->thumbFileType = $thumbFileType;
 

@@ -1,204 +1,12 @@
 <?php declare(strict_types=1);
-/**
- * Type enum + helper functions.
- *
- * This file is part of tg-file-decoder.
- * tg-file-decoder is free software: you can redistribute it and/or modify it under the terms of the GNU Affero General Public License as published by the Free Software Foundation, either version 3 of the License, or (at your option) any later version.
- * tg-file-decoder is distributed in the hope that it will be useful, but WITHOUT ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.
- * See the GNU Affero General Public License for more details.
- * You should have received a copy of the GNU General Public License along with tg-file-decoder.
- * If not, see <http://www.gnu.org/licenses/>.
- *
- * @author    Daniil Gentili <daniil@daniil.it>
- * @copyright 2016-2019 Daniil Gentili <daniil@daniil.it>
- * @license   https://opensource.org/licenses/AGPL-3.0 AGPLv3
- *
- * @link https://github.com/tg-file-decoder Documentation
- */
 
 namespace danog\Decoder;
-
-/**
- * Thumbnail.
- */
-const THUMBNAIL = 0;
-/**
- * Profile photo.
- * Used for users and channels, chat photos are normal PHOTOs.
- */
-const PROFILE_PHOTO = 1;
-/**
- * Normal photos.
- */
-const PHOTO = 2;
-
-/**
- * Voice messages.
- */
-const VOICE = 3;
-/**
- * Video.
- */
-const VIDEO = 4;
-/**
- * Document.
- */
-const DOCUMENT = 5;
-/**
- * Secret chat document.
- */
-const ENCRYPTED = 6;
-/**
- * Temporary document.
- */
-const TEMP = 7;
-/**
- * Sticker.
- */
-const STICKER = 8;
-/**
- * Music.
- */
-const AUDIO = 9;
-/**
- * GIF.
- */
-const ANIMATION = 10;
-/**
- * Encrypted thumbnail.
- */
-const ENCRYPTED_THUMBNAIL = 11;
-/**
- * Wallpaper.
- */
-const WALLPAPER = 12;
-/**
- * Round video.
- */
-const VIDEO_NOTE = 13;
-/**
- * Passport raw file.
- */
-const SECURE_RAW = 14;
-/**
- * Passport file.
- */
-const SECURE = 15;
-/**
- * Background.
- */
-const BACKGROUND = 16;
-/**
- * Size.
- */
-const SIZE = 17;
-const NONE = 18;
-
-const TYPES = [
-    THUMBNAIL => 'thumbnail',
-    PROFILE_PHOTO => 'profile_photo',
-    PHOTO => 'photo',
-    VOICE => 'voice',
-    VIDEO => 'video',
-    DOCUMENT => 'document',
-    ENCRYPTED => 'encrypted',
-    TEMP => 'temp',
-    STICKER => 'sticker',
-    AUDIO => 'audio',
-    ANIMATION => 'animation',
-    ENCRYPTED_THUMBNAIL => 'encrypted_thumbnail',
-    WALLPAPER => 'wallpaper',
-    VIDEO_NOTE => 'video_note',
-    SECURE_RAW => 'secure_raw',
-    SECURE => 'secure',
-    BACKGROUND => 'background',
-    SIZE => 'size'
-];
-const TYPES_IDS = [
-    'thumbnail' => THUMBNAIL,
-    'profile_photo' => PROFILE_PHOTO,
-    'photo' => PHOTO,
-    'voice' => VOICE,
-    'video' => VIDEO,
-    'document' => DOCUMENT,
-    'encrypted' => ENCRYPTED,
-    'temp' => TEMP,
-    'sticker' => STICKER,
-    'audio' => AUDIO,
-    'animation' => ANIMATION,
-    'encrypted_thumbnail' => ENCRYPTED_THUMBNAIL,
-    'wallpaper' => WALLPAPER,
-    'video_note' => VIDEO_NOTE,
-    'secure_raw' => SECURE_RAW,
-    'secure' => SECURE,
-    'background' => BACKGROUND,
-    'size' => SIZE
-];
-
-const UNIQUE_WEB = 0;
-const UNIQUE_PHOTO = 1;
-const UNIQUE_DOCUMENT = 2;
-const UNIQUE_SECURE = 3;
-const UNIQUE_ENCRYPTED = 4;
-const UNIQUE_TEMP = 5;
-
-const UNIQUE_TYPES = [
-    UNIQUE_WEB => 'web',
-    UNIQUE_PHOTO => 'photo',
-    UNIQUE_DOCUMENT => 'document',
-    UNIQUE_SECURE => 'secure',
-    UNIQUE_ENCRYPTED => 'encrypted',
-    UNIQUE_TEMP => 'temp'
-];
-
-const UNIQUE_TYPES_IDS = [
-    'web' => UNIQUE_WEB,
-    'photo' => UNIQUE_PHOTO,
-    'document' => UNIQUE_DOCUMENT,
-    'secure' => UNIQUE_SECURE,
-    'encrypted' => UNIQUE_ENCRYPTED,
-    'temp' => UNIQUE_TEMP
-];
-
-const FULL_UNIQUE_MAP = [
-    PHOTO => UNIQUE_PHOTO,
-    PROFILE_PHOTO => UNIQUE_PHOTO,
-    THUMBNAIL => UNIQUE_PHOTO,
-    ENCRYPTED_THUMBNAIL => UNIQUE_PHOTO,
-    WALLPAPER => UNIQUE_PHOTO,
-
-    VIDEO => UNIQUE_DOCUMENT,
-    VOICE => UNIQUE_DOCUMENT,
-    DOCUMENT => UNIQUE_DOCUMENT,
-    STICKER => UNIQUE_DOCUMENT,
-    AUDIO => UNIQUE_DOCUMENT,
-    ANIMATION => UNIQUE_DOCUMENT,
-    VIDEO_NOTE => UNIQUE_DOCUMENT,
-    BACKGROUND => UNIQUE_DOCUMENT,
-
-    SECURE => UNIQUE_SECURE,
-    SECURE_RAW => UNIQUE_SECURE,
-
-    ENCRYPTED => UNIQUE_ENCRYPTED,
-
-    TEMP => UNIQUE_TEMP
-];
-
-const PHOTOSIZE_SOURCE_LEGACY = 0;
-const PHOTOSIZE_SOURCE_THUMBNAIL = 1;
-const PHOTOSIZE_SOURCE_DIALOGPHOTO_SMALL = 2;
-const PHOTOSIZE_SOURCE_DIALOGPHOTO_BIG = 3;
-const PHOTOSIZE_SOURCE_STICKERSET_THUMBNAIL = 4;
-const PHOTOSIZE_SOURCE_FULL_LEGACY = 5;
-const PHOTOSIZE_SOURCE_DIALOGPHOTO_SMALL_LEGACY = 6;
-const PHOTOSIZE_SOURCE_DIALOGPHOTO_BIG_LEGACY = 7;
-const PHOTOSIZE_SOURCE_STICKERSET_THUMBNAIL_LEGACY = 8;
-const PHOTOSIZE_SOURCE_STICKERSET_THUMBNAIL_VERSION = 9;
 
 const WEB_LOCATION_FLAG =  1 << 24;
 const FILE_REFERENCE_FLAG = 1 << 25;
 const LONG = PHP_INT_SIZE === 8 ? 'Q' : 'l2';
 
+/** @psalm-suppress UnusedVariable */
 $BIG_ENDIAN = \pack('L', 1) === \pack('N', 1);
 
 /**
@@ -361,7 +169,6 @@ function rleEncode(string $string): string
     }
     if ($count > 0) {
         $new .= $null.\chr($count);
-        $count = 0;
     }
 
     return $new;
@@ -404,15 +211,16 @@ function readTLString(mixed $stream): string
         $x = \stream_get_contents($stream, $long_len);
         $resto = posmod(-$long_len, 4);
         if ($resto > 0) {
-            \stream_get_contents($stream, $resto);
+            \fseek($stream, $resto, SEEK_CUR);
         }
     } else {
         $x = $l ? \stream_get_contents($stream, $l) : '';
         $resto = posmod(-($l + 1), 4);
         if ($resto > 0) {
-            \stream_get_contents($stream, $resto);
+            \fseek($stream, $resto, SEEK_CUR);
         }
     }
+    \assert($x !== false);
     return $x;
 }
 
@@ -462,10 +270,7 @@ function internalDecode(string $fileId): array
     $result['hasWebLocation'] = (bool) ($result['typeId'] & WEB_LOCATION_FLAG);
     $result['typeId'] &= ~FILE_REFERENCE_FLAG;
     $result['typeId'] &= ~WEB_LOCATION_FLAG;
-    if (!isset(TYPES[$result['typeId']])) {
-        throw new \InvalidArgumentException("Invalid file type provided: {$result['typeId']}");
-    }
-    $result['type'] = TYPES[$result['typeId']];
+    $result['type'] = FileIdType::from($result['typeId']);
     $res = \fopen('php://memory', 'rw+b');
     \fwrite($res, \substr($fileId, 8));
     \fseek($res, 0);
@@ -485,38 +290,38 @@ function internalDecode(string $fileId): array
     fixLong($result, 'id');
     fixLong($result, 'access_hash');
 
-    if ($result['typeId'] <= PHOTO) {
+    if ($result['typeId'] <= FileIdType::PHOTO->value) {
         $parsePhotoSize = function () use (&$result, &$fileId) {
             $result['photosize_source'] = $result['subVersion'] >= 4 ? \unpack('V', \stream_get_contents($fileId, 4))[1] : 0;
             switch ($result['photosize_source']) {
-                case PHOTOSIZE_SOURCE_LEGACY:
+                case PhotoSizeSourceType::LEGACY:
                     $result += \unpack(LONG.'secret', \stream_get_contents($fileId, 8));
                     fixLong($result, 'secret');
                     break;
-                case PHOTOSIZE_SOURCE_THUMBNAIL:
+                case PhotoSizeSourceType::THUMBNAIL:
                     $result += \unpack('Vfile_type/athumbnail_type', \stream_get_contents($fileId, 8));
                     break;
-                case PHOTOSIZE_SOURCE_DIALOGPHOTO_BIG:
-                case PHOTOSIZE_SOURCE_DIALOGPHOTO_SMALL:
-                    $result['photo_size'] = $result['photosize_source'] === PHOTOSIZE_SOURCE_DIALOGPHOTO_SMALL ? 'photo_small' : 'photo_big';
+                case PhotoSizeSourceType::DIALOGPHOTO_BIG:
+                case PhotoSizeSourceType::DIALOGPHOTO_SMALL:
+                    $result['photo_size'] = $result['photosize_source'] === PhotoSizeSourceType::DIALOGPHOTO_SMALL ? 'photo_small' : 'photo_big';
                     $result['dialog_id'] = unpackLong(\stream_get_contents($fileId, 8));
                     $result['dialog_access_hash'] = \unpack(LONG, \stream_get_contents($fileId, 8))[1];
                     fixLong($result, 'dialog_access_hash');
                     break;
-                case PHOTOSIZE_SOURCE_STICKERSET_THUMBNAIL:
+                case PhotoSizeSourceType::STICKERSET_THUMBNAIL:
                     $result += \unpack(LONG.'sticker_set_id/'.LONG.'sticker_set_access_hash', \stream_get_contents($fileId, 16));
                     fixLong($result, 'sticker_set_id');
                     fixLong($result, 'sticker_set_access_hash');
                     break;
 
-                case PHOTOSIZE_SOURCE_FULL_LEGACY:
+                case PhotoSizeSourceType::FULL_LEGACY:
                     $result += \unpack(LONG.'volume_id/'.LONG.'secret/llocal_id', \stream_get_contents($fileId, 20));
                     fixLong($result, 'volume_id');
                     fixLong($result, 'secret');
                     break;
-                case PHOTOSIZE_SOURCE_DIALOGPHOTO_BIG_LEGACY:
-                case PHOTOSIZE_SOURCE_DIALOGPHOTO_SMALL_LEGACY:
-                    $result['photo_size'] = $result['photosize_source'] === PHOTOSIZE_SOURCE_DIALOGPHOTO_SMALL_LEGACY ? 'photo_small' : 'photo_big';
+                case PhotoSizeSourceType::DIALOGPHOTO_BIG_LEGACY:
+                case PhotoSizeSourceType::DIALOGPHOTO_SMALL_LEGACY:
+                    $result['photo_size'] = $result['photosize_source'] === PhotoSizeSourceType::DIALOGPHOTO_SMALL_LEGACY ? 'photo_small' : 'photo_big';
                     $result['dialog_id'] = unpackLong(\stream_get_contents($fileId, 8));
                     $result['dialog_access_hash'] = \unpack(LONG, \stream_get_contents($fileId, 8))[1];
                     fixLong($result, 'dialog_access_hash');
@@ -524,7 +329,7 @@ function internalDecode(string $fileId): array
                     $result += \unpack(LONG.'volume_id/llocal_id', \stream_get_contents($fileId, 12));
                     fixLong($result, 'volume_id');
                     break;
-                case PHOTOSIZE_SOURCE_STICKERSET_THUMBNAIL_LEGACY:
+                case PhotoSizeSourceType::STICKERSET_THUMBNAIL_LEGACY:
                     $result += \unpack(LONG.'sticker_set_id/'.LONG.'sticker_set_access_hash', \stream_get_contents($fileId, 16));
                     fixLong($result, 'sticker_set_id');
                     fixLong($result, 'sticker_set_access_hash');
@@ -533,7 +338,7 @@ function internalDecode(string $fileId): array
                     fixLong($result, 'volume_id');
                     break;
 
-                case PHOTOSIZE_SOURCE_STICKERSET_THUMBNAIL_VERSION:
+                case PhotoSizeSourceType::STICKERSET_THUMBNAIL_VERSION:
                     $result += \unpack(LONG.'sticker_set_id/'.LONG.'sticker_set_access_hash/lsticker_version', \stream_get_contents($fileId, 20));
                     fixLong($result, 'sticker_set_id');
                     fixLong($result, 'sticker_set_access_hash');
@@ -579,13 +384,10 @@ function internalDecodeUnique(string $fileId): array
     $fileId = rleDecode(base64urlDecode($fileId));
 
     $result = \unpack('VtypeId', $fileId);
-    if (!isset(UNIQUE_TYPES[$result['typeId']])) {
-        throw new \InvalidArgumentException("Invalid file type provided: {$result['typeId']}");
-    }
-    $result['type'] = UNIQUE_TYPES[$result['typeId']];
+    $result['type'] = UniqueFileIdType::from($result['typeId']);
 
     $fileId = \substr($fileId, 4);
-    if ($result['typeId'] === UNIQUE_WEB) {
+    if ($result['typeId'] === UniqueFileIdType::WEB) {
         $res = \fopen('php://memory', 'rw+b');
         \fwrite($res, $fileId);
         \fseek($res, 0);
@@ -624,5 +426,6 @@ function internalDecodeUnique(string $fileId): array
         \trigger_error("Unique file ID $orig has $l bytes of leftover data");
     }
 
+    \assert($result !== false);
     return $result;
 }

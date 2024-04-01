@@ -26,8 +26,10 @@ use danog\Decoder\PhotoSizeSource\PhotoSizeSourceThumbnail;
 
 /**
  * Represents decoded bot API file ID.
+ *
+ * @api
  */
-class FileId
+final class FileId
 {
     /**
      * Bot API file ID version.
@@ -51,7 +53,7 @@ class FileId
      * File type.
      *
      */
-    private int $type = 0;
+    private FileIdType $type = FileIdType::NONE;
 
     /**
      * File reference.
@@ -123,7 +125,7 @@ class FileId
         }
         $result->setId($resultArray['id']);
 
-        if ($result->getType() <= PHOTO) {
+        if ($result->getType()->value <= FileIdType::PHOTO->value) {
             if (isset($resultArray['volume_id'])) {
                 $result->setVolumeId($resultArray['volume_id']);
             }
@@ -131,31 +133,31 @@ class FileId
                 $result->setLocalId($resultArray['local_id']);
             }
             switch ($resultArray['photosize_source']) {
-                case PHOTOSIZE_SOURCE_LEGACY:
-                case PHOTOSIZE_SOURCE_FULL_LEGACY:
+                case PhotoSizeSourceType::LEGACY:
+                case PhotoSizeSourceType::FULL_LEGACY:
                     $photoSizeSource = new PhotoSizeSourceLegacy($resultArray['photosize_source']);
                     $photoSizeSource->setSecret($resultArray['secret']);
                     break;
-                case PHOTOSIZE_SOURCE_THUMBNAIL:
+                case PhotoSizeSourceType::THUMBNAIL:
                     $photoSizeSource = new PhotoSizeSourceThumbnail($resultArray['photosize_source']);
                     $photoSizeSource->setThumbType($resultArray['thumbnail_type']);
                     $photoSizeSource->setThumbFileType($resultArray['file_type']);
                     break;
-                case PHOTOSIZE_SOURCE_DIALOGPHOTO_BIG_LEGACY:
-                case PHOTOSIZE_SOURCE_DIALOGPHOTO_SMALL_LEGACY:
-                case PHOTOSIZE_SOURCE_DIALOGPHOTO_BIG:
-                case PHOTOSIZE_SOURCE_DIALOGPHOTO_SMALL:
+                case PhotoSizeSourceType::DIALOGPHOTO_BIG_LEGACY:
+                case PhotoSizeSourceType::DIALOGPHOTO_SMALL_LEGACY:
+                case PhotoSizeSourceType::DIALOGPHOTO_BIG:
+                case PhotoSizeSourceType::DIALOGPHOTO_SMALL:
                     $photoSizeSource = new PhotoSizeSourceDialogPhoto($resultArray['photosize_source']);
                     $photoSizeSource->setDialogId($resultArray['dialog_id']);
                     $photoSizeSource->setDialogAccessHash($resultArray['dialog_access_hash']);
                     break;
-                case PHOTOSIZE_SOURCE_STICKERSET_THUMBNAIL:
-                case PHOTOSIZE_SOURCE_STICKERSET_THUMBNAIL_LEGACY:
+                case PhotoSizeSourceType::STICKERSET_THUMBNAIL:
+                case PhotoSizeSourceType::STICKERSET_THUMBNAIL_LEGACY:
                     $photoSizeSource = new PhotoSizeSourceStickersetThumbnail($resultArray['photosize_source']);
                     $photoSizeSource->setStickerSetId($resultArray['sticker_set_id']);
                     $photoSizeSource->setStickerSetAccessHash($resultArray['sticker_set_access_hash']);
                     break;
-                case PHOTOSIZE_SOURCE_STICKERSET_THUMBNAIL_VERSION:
+                case PhotoSizeSourceType::STICKERSET_THUMBNAIL_VERSION:
                     $photoSizeSource = new PhotoSizeSourceStickersetThumbnailVersion($resultArray['photosize_source']);
                     $photoSizeSource->setStickerSetId($resultArray['sticker_set_id']);
                     $photoSizeSource->setStickerSetAccessHash($resultArray['sticker_set_access_hash']);
@@ -174,7 +176,7 @@ class FileId
      */
     public function getBotAPI(): string
     {
-        $type = $this->getType();
+        $type = $this->getType()->value;
         if ($this->hasFileReference()) {
             $type |= FILE_REFERENCE_FLAG;
         }
@@ -195,40 +197,46 @@ class FileId
         $fileId .= packLong($this->getId());
         $fileId .= packLong($this->getAccessHash());
 
-        if ($this->getType() <= PHOTO) {
+        if ($this->getType()->value <= FileIdType::PHOTO->value) {
             $photoSize = $this->getPhotoSizeSource();
             $fileId .= \pack('V', $photoSize->getType());
             switch ($photoSize->getType()) {
-                case PHOTOSIZE_SOURCE_LEGACY:
+                case PhotoSizeSourceType::LEGACY:
+                    assert($photoSize instanceof PhotoSizeSourceLegacy);
                     $fileId .= packLong($photoSize->getSecret());
                     break;
-                case PHOTOSIZE_SOURCE_FULL_LEGACY:
+                case PhotoSizeSourceType::FULL_LEGACY:
+                    assert($photoSize instanceof PhotoSizeSourceLegacy);
                     $fileId .= packLong($this->getVolumeId());
                     $fileId .= packLong($photoSize->getSecret());
                     $fileId .= \pack('l', $this->getLocalId());
                     break;
-                case PHOTOSIZE_SOURCE_THUMBNAIL:
+                case PhotoSizeSourceType::THUMBNAIL:
+                    assert($photoSize instanceof PhotoSizeSourceThumbnail);
                     $fileId .= \pack('Va4', $photoSize->getThumbFileType(), $photoSize->getThumbType());
                     break;
-                case PHOTOSIZE_SOURCE_DIALOGPHOTO_BIG:
-                case PHOTOSIZE_SOURCE_DIALOGPHOTO_SMALL:
-                case PHOTOSIZE_SOURCE_DIALOGPHOTO_BIG_LEGACY:
-                case PHOTOSIZE_SOURCE_DIALOGPHOTO_SMALL_LEGACY:
+                case PhotoSizeSourceType::DIALOGPHOTO_BIG:
+                case PhotoSizeSourceType::DIALOGPHOTO_SMALL:
+                case PhotoSizeSourceType::DIALOGPHOTO_BIG_LEGACY:
+                case PhotoSizeSourceType::DIALOGPHOTO_SMALL_LEGACY:
+                    assert($photoSize instanceof PhotoSizeSourceDialogPhoto);
                     $fileId .= packLongBig($photoSize->getDialogId());
                     $fileId .= packLong($photoSize->getDialogAccessHash());
                     break;
-                case PHOTOSIZE_SOURCE_STICKERSET_THUMBNAIL:
-                case PHOTOSIZE_SOURCE_STICKERSET_THUMBNAIL_LEGACY:
+                case PhotoSizeSourceType::STICKERSET_THUMBNAIL:
+                case PhotoSizeSourceType::STICKERSET_THUMBNAIL_LEGACY:
+                    assert($photoSize instanceof PhotoSizeSourceStickersetThumbnail);
                     $fileId .= packLong($photoSize->getStickerSetId());
                     $fileId .= packLong($photoSize->getStickerSetAccessHash());
                     break;
-                case PHOTOSIZE_SOURCE_STICKERSET_THUMBNAIL_VERSION:
+                case PhotoSizeSourceType::STICKERSET_THUMBNAIL_VERSION:
+                    assert($photoSize instanceof PhotoSizeSourceStickersetThumbnailVersion);
                     $fileId .= packLong($photoSize->getStickerSetId());
                     $fileId .= packLong($photoSize->getStickerSetAccessHash());
                     $fileId .= \pack('l', $photoSize->getStickerSetVersion());
                     break;
             }
-            if ($photoSize->getType() >= PHOTOSIZE_SOURCE_DIALOGPHOTO_SMALL_LEGACY && $photoSize->getType() <= PHOTOSIZE_SOURCE_STICKERSET_THUMBNAIL_LEGACY) {
+            if ($photoSize->getType() >= PhotoSizeSourceType::DIALOGPHOTO_SMALL_LEGACY && $photoSize->getType()->value <= PhotoSizeSourceType::STICKERSET_THUMBNAIL_LEGACY->value) {
                 $fileId .= packLong($this->getVolumeId());
                 $fileId .= \pack('l', $this->getLocalId());
             }
@@ -314,27 +322,18 @@ class FileId
      * Get file type.
      *
      */
-    public function getType(): int
+    public function getType(): FileIdType
     {
         return $this->type;
     }
 
     /**
-     * Get file type as string.
-     *
-     */
-    public function getTypeName(): string
-    {
-        return TYPES[$this->type];
-    }
-
-    /**
      * Set file type.
      *
-     * @param int $type File type.
+     * @param FileIdType $type File type.
      *
      */
-    public function setType(int $type): self
+    public function setType(FileIdType $type): self
     {
         $this->type = $type;
 

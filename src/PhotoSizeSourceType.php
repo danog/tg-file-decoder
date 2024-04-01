@@ -1,6 +1,7 @@
 <?php declare(strict_types=1);
+
 /**
- * Photosize source class.
+ * Type enum + helper functions.
  *
  * This file is part of tg-file-decoder.
  * tg-file-decoder is free software: you can redistribute it and/or modify it under the terms of the GNU Affero General Public License as published by the Free Software Foundation, either version 3 of the License, or (at your option) any later version.
@@ -16,45 +17,18 @@
  * @link https://github.com/tg-file-decoder Documentation
  */
 
-namespace danog\Decoder\PhotoSizeSource;
+namespace danog\Decoder;
 
-use danog\Decoder\PhotoSizeSource;
-
-/**
- * Represents source of photosize.
- *
- * @api
- *
- * @extends PhotoSizeSource<PhotoSizeSourceLegacy>
- */
-final class PhotoSizeSourceLegacy extends PhotoSizeSource
+enum PhotoSizeSourceType: int
 {
-    /**
-     * Secret legacy ID.
-     *
-     */
-    private int $secret;
-
-    /**
-     * Get secret legacy ID.
-     *
-     * @return int
-     */
-    public function getSecret()
-    {
-        return $this->secret;
-    }
-
-    /**
-     * Set secret legacy ID.
-     *
-     * @param int $secret Secret legacy ID
-     *
-     */
-    public function setSecret(int $secret): self
-    {
-        $this->secret = $secret;
-
-        return $this;
-    }
+    case LEGACY = 0;
+    case THUMBNAIL = 1;
+    case DIALOGPHOTO_SMALL = 2;
+    case DIALOGPHOTO_BIG = 3;
+    case STICKERSET_THUMBNAIL = 4;
+    case FULL_LEGACY = 5;
+    case DIALOGPHOTO_SMALL_LEGACY = 6;
+    case DIALOGPHOTO_BIG_LEGACY = 7;
+    case STICKERSET_THUMBNAIL_LEGACY = 8;
+    case STICKERSET_THUMBNAIL_VERSION = 9;
 }

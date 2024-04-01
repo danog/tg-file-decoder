@@ -19,16 +19,16 @@
 namespace danog\Decoder\PhotoSizeSource;
 
 use danog\Decoder\PhotoSizeSource;
-
-use const danog\Decoder\PHOTOSIZE_SOURCE_DIALOGPHOTO_SMALL;
-use const danog\Decoder\PHOTOSIZE_SOURCE_DIALOGPHOTO_SMALL_LEGACY;
+use danog\Decoder\PhotoSizeSourceType;
 
 /**
  * Represents source of photosize.
  *
+ * @api
+ *
  * @extends PhotoSizeSource<PhotoSizeSourceDialogPhoto>
  */
-class PhotoSizeSourceDialogPhoto extends PhotoSizeSource
+final class PhotoSizeSourceDialogPhoto extends PhotoSizeSource
 {
     /**
      * ID of dialog.
@@ -90,6 +90,6 @@ class PhotoSizeSourceDialogPhoto extends PhotoSizeSource
      */
     public function isSmallDialogPhoto(): bool
     {
-        return \in_array($this->getType(), [PHOTOSIZE_SOURCE_DIALOGPHOTO_SMALL_LEGACY, PHOTOSIZE_SOURCE_DIALOGPHOTO_SMALL]);
+        return \in_array($this->getType(), [PhotoSizeSourceType::DIALOGPHOTO_SMALL_LEGACY, PhotoSizeSourceType::DIALOGPHOTO_SMALL], true);
     }
 }
