@@ -9,7 +9,7 @@ jobs:
     strategy:
       matrix:
         tag: ["amd64"]
-        php: ["8.1", "8.2"]
+        php: ["8.2", "8.3"]
     name: PHP ${{ matrix.php }} Test on ${{ matrix.tag }}
     steps:
       - name: Checkout
