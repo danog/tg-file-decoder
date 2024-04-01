@@ -9,7 +9,7 @@ use danog\Decoder\UniqueFileId;
 use PHPUnit\Framework\Attributes\DataProvider;
 use PHPUnit\Framework\TestCase;
 
-/** @api */
+/** @internal */
 class IntegrationTest extends TestCase
 {
     #[DataProvider('provideFileIdsAndType')]

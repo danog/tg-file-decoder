@@ -20,6 +20,11 @@ namespace danog\Decoder;
 
 use AssertionError;
 
+/**
+ * Represents decoded bot API file ID type.
+ *
+ * @api
+ */
 enum FileIdType: int
 {
     /**
@@ -96,8 +101,10 @@ enum FileIdType: int
      * Size.
      */
     case SIZE = 17;
-    case NONE = 18;
 
+    /**
+     * Obtain a FileId enum variant from a bot API type name.
+     */
     public static function fromBotApiType(string $type): self
     {
         return match ($type) {
@@ -119,6 +126,33 @@ enum FileIdType: int
             'secure' => self::SECURE,
             'background' => self::BACKGROUND,
             'size' => self::SIZE,
+        };
+    }
+
+    /**
+     * Obtain a bot API type name.
+     */
+    public function toBotApiType(): string
+    {
+        return match ($this) {
+            self::THUMBNAIL => 'thumbnail' ,
+            self::PROFILE_PHOTO => 'profile_photo',
+            self::PHOTO =>'photo' ,
+            self::VOICE=>'voice' ,
+            self::VIDEO =>'video'  ,
+            self::DOCUMENT=> 'document' ,
+            self::ENCRYPTED =>'encrypted' ,
+            self::TEMP =>'temp',
+            self::STICKER =>'sticker',
+            self::AUDIO =>'audio',
+            self::ANIMATION =>'animation',
+            self::ENCRYPTED_THUMBNAIL =>'encrypted_thumbnail',
+            self::WALLPAPER =>'wallpaper',
+            self::VIDEO_NOTE =>'video_note',
+            self::SECURE_RAW =>'secure_raw',
+            self::SECURE =>'secure',
+            self::BACKGROUND=>'background',
+            self::SIZE=>'size',
         };
     }
 

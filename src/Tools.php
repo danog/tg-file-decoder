@@ -4,6 +4,7 @@ namespace danog\Decoder;
 
 \define('BIG_ENDIAN', \pack('L', 1) === \pack('N', 1));
 
+/** @internal */
 final class Tools
 {
     public const WEB_LOCATION_FLAG =  1 << 24;

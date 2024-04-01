@@ -18,6 +18,11 @@
 
 namespace danog\Decoder;
 
+/**
+ * Represents decoded unique bot API file ID type.
+ *
+ * @api
+ */
 enum UniqueFileIdType: int
 {
     case WEB = 0;

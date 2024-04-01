@@ -2,15 +2,13 @@
 
 ![build](https://github.com/danog/tg-file-decoder/workflows/build/badge.svg)
 
-Decode [Telegram bot API file IDs](https://core.telegram.org).
+Decode and encode [Telegram bot API file IDs](https://core.telegram.org)!  
 
 ## Install
 
 ```bash
 composer require danog/tg-file-decoder
 ```
-
-On 32-bit systems, [phpseclib](https://github.com/phpseclib/phpseclib) is also required.
 
 ## Examples:
 
@@ -22,32 +20,30 @@ use danog\Decoder\UniqueFileId;
 
 $fileId = FileId::fromBotAPI('CAACAgQAAxkDAAJEsl44nl3yxPZ8biI8uhaA7rbQceOSAAKtAQACsTisUXvMEbVnTuQkGAQ');
 
-$version = $fileId->getVersion(); // bot API file ID version, usually 4
-$subVersion = $fileId->getSubVersion(); // bot API file ID subversion, equivalent to a specific tdlib version
+$version = $fileId->version; // bot API file ID version, usually 4
+$subVersion = $fileId->subVersion; // bot API file ID subversion, equivalent to a specific tdlib version
 
-$dcId = $fileId->getDcId(); // On which datacenter is this file stored
+$dcId = $fileId->dcId; // On which datacenter is this file stored
 
-$type = $fileId->getType(); // File type
-$typeName = $fileId->getTypeName(); // File type (as string)
+$type = $fileId->type; // File type
 
-$id = $fileId->getId();
-$accessHash = $fileId->getAccessHash();
+$id = $fileId->id;
+$accessHash = $fileId->accessHash;
 
-$fileReference = $fileId->getFileReference(); // File reference, https://core.telegram.org/api/file_reference
-$url = $fileId->getUrl(); // URL, file IDs with encoded webLocation
+$fileReference = $fileId->fileReference; // File reference, https://core.telegram.org/api/file_reference
+$url = $fileId->url; // URL, file IDs with encoded webLocation
 
 // You can also use hasFileReference and hasUrl
 $fileIdReencoded = $fileId->getBotAPI(); // CAACAgQAAxkDAAJEsl44nl3yxPZ8biI8uhaA7rbQceOSAAKtAQACsTisUXvMEbVnTuQkGAQ
 $fileIdReencoded = (string) $fileId;     // CAACAgQAAxkDAAJEsl44nl3yxPZ8biI8uhaA7rbQceOSAAKtAQACsTisUXvMEbVnTuQkGAQ
 
-// For photos, thumbnails if ($fileId->getType() <= PHOTO)
-$volumeId = $fileId->getVolumeID();
-$localId = $fileId->getLocalID();
+// For photos, thumbnails if ($fileId->getType() <= FileIdType::PHOTO->value)
+$volumeId = $fileId->volumeId;
+$localId = $fileId->localId;
 
-// if $fileId->hasPhotoSizeSource()
-$photoSizeSource = $fileId->getPhotoSizeSource(); // PhotoSizeSource object
-$photoSizeSource->getDialogId();
-$photoSizeSource->getStickerSetId();
+$photoSizeSource = $fileId->photoSizeSource; // PhotoSizeSource object
+$photoSizeSource->dialogId;
+$photoSizeSource->stickerSetId;
 
 // And more, depending on photosize source
 ```
@@ -62,17 +58,14 @@ For photosize source, see [here](#photosize-source).
 ```php
 $uniqueFileId = UniqueFileId::fromUniqueBotAPI('AgADrQEAArE4rFE');
 
-$type = $fileId->getType(); // Unique file type
-$typeName = $fileId->getTypeName(); // Unique file type (as string)
+$type = $fileId->type; // Unique file type
 
-$id = $uniqueFileId->getId();
-$accessHash = $uniqueFileId->getAccessHash();
-$url = $uniqueFileId->getUrl(); // URL, for unique file IDs with encoded webLocation
-// You can also use hasUrl
+$id = $uniqueFileId->id;
+$url = $uniqueFileId->url; // URL, for unique file IDs with encoded webLocation
 
 // For photos
-$volumeId = $uniqueFileId->getVolumeID();
-$localId = $uniqueFileId->getLocalID();
+$volumeId = $uniqueFileId->volumeId;
+$localId = $uniqueFileId->localId;
 ```
 
 For unique file types, see [unique types](#bot-api-unique-file-id-types).
@@ -98,25 +91,19 @@ var_dump(((string) $uniqueFileId) === ((string) $uniqueFileIdExtracted2)); // tr
 ```php
 $fileId = FileId::fromString('CAACAgQAAxkDAAJEsl44nl3yxPZ8biI8uhaA7rbQceOSAAKtAQACsTisUXvMEbVnTuQkGAQ');
 
-$photoSizeSource = $fileId->getPhotoSizeSource(); // PhotoSizeSource object
+$photoSizeSource = $fileId->photoSizeSource; // PhotoSizeSource object
 
-$sourceType = $photoSizeSource->getType();
+$sourceType = $photoSizeSource->type;
 
 // If $sourceType === PHOTOSIZE_SOURCE_DIALOGPHOTO_SMALL|PHOTOSIZE_SOURCE_DIALOGPHOTO_SMALL or 
 // If $photoSizeSource instanceof PhotoSizeSourceDialogPhoto
-$dialogId = $photoSizeSource->getDialogId();
-$dialogId = $photoSizeSource->getStickerSetId();
+$dialogId = $photoSizeSource->dialogId;
+$dialogId = $photoSizeSource->sticketSetId;
 ```
 
 The `PhotoSizeSource` abstract base class indicates the source of a specific photosize from a chat photo, photo, stickerset thumbnail, file thumbnail.
-Each photosize type (`getType`) is mapped to a specific subclass of the `PhotoSizeSource` abstract class, returned when calling getPhotoSizeSource.
-The photosize type is one of:
 
-* `const PHOTOSIZE_SOURCE_LEGACY = 0` - Legacy, used for file IDs with the deprecated `secret` field, returns [PhotoSizeSourceLegacy](#photosizesourcelegacy) class.
-* `const PHOTOSIZE_SOURCE_THUMBNAIL = 1` - Used for document and photo thumbnail, returns [PhotoSizeSourceThumbnail](#photosizesourcethumbnail) class.
-* `const PHOTOSIZE_SOURCE_DIALOGPHOTO_SMALL = 2` - Used for dialog photos, returns [PhotoSizeSourceDialogPhoto](#photosizesourcedialogphoto) class.
-* `const PHOTOSIZE_SOURCE_DIALOGPHOTO_BIG = 3` - Used for dialog photos, returns [PhotoSizeSourceDialogPhoto](#photosizesourcedialogphoto) class.
-* `const PHOTOSIZE_SOURCE_STICKERSET_THUMBNAIL = 4` - Used for document and photo thumbnails, returns [PhotoSizeSourceThumbnail](#photosizesourcethumbnail) class.
+Click [here &raquo;](https://github.com/danog/tg-file-decoder/blob/master/docs/index.md) to view the full list of `PhotoSizeSource` types.  
 
 ### Building custom file IDs
 
@@ -131,8 +118,6 @@ $fileId->setAccessHash($customHash);
 
 $encoded = (string) $fileId; // CAACAgQAAxkDAAJEsl44nl3yxPZ8biI8uhaA7rbQceOSAAKtAQACsTisUXvMEbVnTuQkGAQ, or something
 ```
-
-All classes, from [FileId](#fileid), to [UniqueFileID](#uniquefileid), to [PhotoSizeSource](PhotoSizeSourceDialogPhoto) can be built using `set` methods for each and every field.
 
 ### Bot API file ID types
 
@@ -182,3 +167,5 @@ The `FULL_UNIQUE_MAP` array contains a `full file type` => `unique file type` ma
 * `const UNIQUE_TEMP = 5` - Used for temp files
 
 ## Full API documentation
+
+Click [here &raquo;](https://github.com/danog/tg-file-decoder/blob/master/docs/index.md) to view the full API documentation.  
