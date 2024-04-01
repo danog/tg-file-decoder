@@ -3,7 +3,6 @@
 ![build](https://github.com/danog/tg-file-decoder/workflows/build/badge.svg)
 [![Psalm coverage](https://shepherd.dev/github/danog/tg-file-decoder/coverage.svg)](https://shepherd.dev/github/danog/tg-file-decoder)
 [![Psalm level 1](https://shepherd.dev/github/danog/tg-file-decoder/level.svg)](https://shepherd.dev/github/danog/tg-file-decoder)
-![License](https://img.shields.io/github/license/danog/tg-file-decoder)
 
 Decode and encode [Telegram bot API file IDs](https://core.telegram.org)!  
 
