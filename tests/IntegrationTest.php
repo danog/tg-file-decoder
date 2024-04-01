@@ -1,4 +1,4 @@
-<?php
+<?php declare(strict_types=1);
 
 namespace danog\Decoder\Test;
 
@@ -13,7 +13,6 @@ use const danog\Decoder\TYPES_IDS;
 class IntegrationTest extends TestCase
 {
     /**
-     * @param string $fileId File ID
      * @param string $type   Expected type
      *
      * @dataProvider provideFileIdsAndType

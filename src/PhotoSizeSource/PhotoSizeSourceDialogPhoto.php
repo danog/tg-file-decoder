@@ -1,4 +1,4 @@
-<?php
+<?php declare(strict_types=1);
 /**
  * Photosize source class.
  *
@@ -33,15 +33,13 @@ class PhotoSizeSourceDialogPhoto extends PhotoSizeSource
     /**
      * ID of dialog.
      *
-     * @var int
      */
-    private $_dialogId;
+    private int $dialogId;
     /**
      * Access hash of dialog.
      *
-     * @var int
      */
-    private $_dialogAccessHash;
+    private int $dialogAccessHash;
 
     /**
      * Get dialog ID.
@@ -50,18 +48,17 @@ class PhotoSizeSourceDialogPhoto extends PhotoSizeSource
      */
     public function getDialogId()
     {
-        return $this->_dialogId;
+        return $this->dialogId;
     }
     /**
      * Set dialog ID.
      *
      * @param int $id Dialog ID
      *
-     * @return self
      */
-    public function setDialogId($id): self
+    public function setDialogId(int $id): self
     {
-        $this->_dialogId = $id;
+        $this->dialogId = $id;
         return $this;
     }
     /**
@@ -71,7 +68,7 @@ class PhotoSizeSourceDialogPhoto extends PhotoSizeSource
      */
     public function getDialogAccessHash()
     {
-        return $this->_dialogAccessHash;
+        return $this->dialogAccessHash;
     }
 
     /**
@@ -79,11 +76,10 @@ class PhotoSizeSourceDialogPhoto extends PhotoSizeSource
      *
      * @param int $dialogAccessHash Access hash of dialog
      *
-     * @return self
      */
-    public function setDialogAccessHash($dialogAccessHash): self
+    public function setDialogAccessHash(int $dialogAccessHash): self
     {
-        $this->_dialogAccessHash = $dialogAccessHash;
+        $this->dialogAccessHash = $dialogAccessHash;
 
         return $this;
     }
@@ -91,7 +87,6 @@ class PhotoSizeSourceDialogPhoto extends PhotoSizeSource
     /**
      * Get whether the big or small version of the photo is being used.
      *
-     * @return bool
      */
     public function isSmallDialogPhoto(): bool
     {

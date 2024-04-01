@@ -1,4 +1,4 @@
-<?php
+<?php declare(strict_types=1);
 /**
  * Photosize source class.
  *
@@ -30,45 +30,40 @@ class PhotoSizeSourceThumbnail extends PhotoSizeSource
     /**
      * File type of original file.
      *
-     * @var int
      */
-    private $_thumbFileType;
+    private int $thumbFileType;
     /**
      * Thumbnail size.
      *
-     * @var string
      */
-    private $_thumbType;
+    private string $thumbType;
 
     /**
      * Get file type of original file.
      *
-     * @return int
      */
     public function getThumbFileType(): int
     {
-        return $this->_thumbFileType;
+        return $this->thumbFileType;
     }
     /**
      * Get file type of original file as string.
      *
-     * @return string
      */
     public function getThumbFileTypeString(): string
     {
-        return TYPES[$this->_thumbFileType];
+        return TYPES[$this->thumbFileType];
     }
 
     /**
      * Set file type of original file.
      *
-     * @param int $_thumbFileType File type of original file
+     * @param int $thumbFileType File type of original file
      *
-     * @return self
      */
-    public function setThumbFileType(int $_thumbFileType): self
+    public function setThumbFileType(int $thumbFileType): self
     {
-        $this->_thumbFileType = $_thumbFileType;
+        $this->thumbFileType = $thumbFileType;
 
         return $this;
     }
@@ -76,23 +71,21 @@ class PhotoSizeSourceThumbnail extends PhotoSizeSource
     /**
      * Get thumbnail size.
      *
-     * @return string
      */
     public function getThumbType(): string
     {
-        return $this->_thumbType;
+        return $this->thumbType;
     }
 
     /**
      * Set thumbnail size.
      *
-     * @param string $_thumbType Thumbnail size
+     * @param string $thumbType Thumbnail size
      *
-     * @return self
      */
-    public function setThumbType(string $_thumbType): self
+    public function setThumbType(string $thumbType): self
     {
-        $this->_thumbType = $_thumbType;
+        $this->thumbType = $thumbType;
 
         return $this;
     }

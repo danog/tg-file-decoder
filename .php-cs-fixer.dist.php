@@ -1,6 +1,17 @@
 <?php
 
-$config = new Amp\CodeStyle\Config();
+$config = new class extends Amp\CodeStyle\Config {
+    public function getRules(): array
+    {
+        return array_merge(
+            parent::getRules(),
+            [
+                'phpdoc_to_property_type' => true,
+                'phpdoc_to_param_type' => true,
+            ]
+        );
+    }  
+};
 $config->getFinder()
     ->in(__DIR__ . '/src')
     ->in(__DIR__ . '/tests');

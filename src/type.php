@@ -1,4 +1,4 @@
-<?php
+<?php declare(strict_types=1);
 /**
  * Type enum + helper functions.
  *
@@ -226,11 +226,9 @@ function unpackLong(string $field)
 /**
  * Pack string long.
  *
- * @param string|int $field
  *
- * @return string
  */
-function packLongBig($field): string
+function packLongBig(string|int $field): string
 {
     if (PHP_INT_SIZE === 8) {
         /** @psalm-suppress InvalidGlobal */
@@ -272,9 +270,8 @@ function fixLong(array &$params, string $field)
  *
  * @param string|int|int[] $fields Fields to encode
  *
- * @return string
  */
-function packLong($fields): string
+function packLong(string|int|array $fields): string
 {
     if (\is_string($fields)) { // Already encoded, we hope
         return $fields;
@@ -292,7 +289,6 @@ function packLong($fields): string
  *
  * @internal
  *
- * @return string
  */
 function base64urlDecode(string $data): string
 {
@@ -306,7 +302,6 @@ function base64urlDecode(string $data): string
  *
  * @internal
  *
- * @return string
  */
 function base64urlEncode(string $data): string
 {
@@ -320,7 +315,6 @@ function base64urlEncode(string $data): string
  *
  * @internal
  *
- * @return string
  */
 function rleDecode(string $string): string
 {
@@ -348,7 +342,6 @@ function rleDecode(string $string): string
  *
  * @internal
  *
- * @return string
  */
 function rleEncode(string $string): string
 {
@@ -373,7 +366,6 @@ function rleEncode(string $string): string
 
     return $new;
 }
-
 
 /**
  * Positive modulo
@@ -400,9 +392,8 @@ function posmod(int $a, int $b): int
  *
  * @internal
  *
- * @return string
  */
-function readTLString($stream): string
+function readTLString(mixed $stream): string
 {
     $l = \ord(\stream_get_contents($stream, 1));
     if ($l > 254) {
@@ -430,7 +421,6 @@ function readTLString($stream): string
  *
  * @param string $string String
  *
- * @return string
  */
 function packTLString(string $string): string
 {
@@ -458,7 +448,6 @@ function packTLString(string $string): string
  *
  * @internal
  *
- * @return array
  */
 function internalDecode(string $fileId): array
 {
@@ -583,13 +572,11 @@ function internalDecode(string $fileId): array
  *
  * @internal
  *
- * @return array
  */
 function internalDecodeUnique(string $fileId): array
 {
     $orig = $fileId;
     $fileId = rleDecode(base64urlDecode($fileId));
-
 
     $result = \unpack('VtypeId', $fileId);
     if (!isset(UNIQUE_TYPES[$result['typeId']])) {

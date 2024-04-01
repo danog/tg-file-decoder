@@ -1,4 +1,4 @@
-<?php
+<?php declare(strict_types=1);
 /**
  * Decoded FileId class.
  *
@@ -32,78 +32,65 @@ class FileId
     /**
      * Bot API file ID version.
      *
-     * @var int
      */
-    private $_version = 4;
+    private int $version = 4;
 
     /**
      * Bot API file ID subversion.
      *
-     * @var int
      */
-    private $_subVersion = 47;
+    private int $subVersion = 47;
 
     /**
      * DC ID.
      *
-     * @var int
      */
-    private $_dcId = 0;
+    private int $dcId = 0;
 
     /**
      * File type.
      *
-     * @var int
      */
-    private $_type = 0;
+    private int $type = 0;
 
     /**
      * File reference.
      *
-     * @var string
      */
-    private $_fileReference = '';
+    private string $fileReference = '';
     /**
      * File URL for weblocation.
      *
-     * @var string
      */
-    private $_url = '';
-
+    private string $url = '';
 
     /**
      * File id.
      *
-     * @var int
      */
-    private $_id;
+    private int $id;
     /**
      * File access hash.
      *
-     * @var int
      */
-    private $_accessHash;
-
+    private int $accessHash;
 
     /**
      * Photo volume ID.
      *
-     * @var int
      */
-    private $_volumeId;
+    private int $volumeId;
     /**
      * Photo local ID.
      *
-     * @var int
      */
-    private $_localId;
+    private int $localId;
 
     /**
      * Photo size source.
      *
-     * @var PhotoSizeSource
      */
-    private $_photoSizeSource;
+    private PhotoSizeSource $photoSizeSource;
     /**
      * Basic constructor function.
      */
@@ -116,7 +103,6 @@ class FileId
      *
      * @param string $fileId File ID
      *
-     * @return self
      */
     public static function fromBotAPI(string $fileId): self
     {
@@ -182,11 +168,9 @@ class FileId
         return $result;
     }
 
-
     /**
      * Get bot API file ID.
      *
-     * @return string
      */
     public function getBotAPI(): string
     {
@@ -261,7 +245,6 @@ class FileId
     /**
      * Get unique file ID from file ID.
      *
-     * @return UniqueFileId
      */
     public function getUnique(): UniqueFileId
     {
@@ -270,7 +253,6 @@ class FileId
     /**
      * Get unique bot API file ID from file ID.
      *
-     * @return string
      */
     public function getUniqueBotAPI(): string
     {
@@ -279,7 +261,6 @@ class FileId
     /**
      * Get bot API file ID.
      *
-     * @return string
      */
     public function __toString(): string
     {
@@ -288,23 +269,21 @@ class FileId
     /**
      * Get bot API file ID version.
      *
-     * @return int
      */
     public function getVersion(): int
     {
-        return $this->_version;
+        return $this->version;
     }
 
     /**
      * Set bot API file ID version.
      *
-     * @param int $_version Bot API file ID version.
+     * @param int $version Bot API file ID version.
      *
-     * @return self
      */
-    public function setVersion(int $_version): self
+    public function setVersion(int $version): self
     {
-        $this->_version = $_version;
+        $this->version = $version;
 
         return $this;
     }
@@ -312,23 +291,21 @@ class FileId
     /**
      * Get bot API file ID subversion.
      *
-     * @return int
      */
     public function getSubVersion(): int
     {
-        return $this->_subVersion;
+        return $this->subVersion;
     }
 
     /**
      * Set bot API file ID subversion.
      *
-     * @param int $_subVersion Bot API file ID subversion.
+     * @param int $subVersion Bot API file ID subversion.
      *
-     * @return self
      */
-    public function setSubVersion(int $_subVersion): self
+    public function setSubVersion(int $subVersion): self
     {
-        $this->_subVersion = $_subVersion;
+        $this->subVersion = $subVersion;
 
         return $this;
     }
@@ -336,33 +313,30 @@ class FileId
     /**
      * Get file type.
      *
-     * @return int
      */
     public function getType(): int
     {
-        return $this->_type;
+        return $this->type;
     }
 
     /**
      * Get file type as string.
      *
-     * @return string
      */
     public function getTypeName(): string
     {
-        return TYPES[$this->_type];
+        return TYPES[$this->type];
     }
 
     /**
      * Set file type.
      *
-     * @param int $_type File type.
+     * @param int $type File type.
      *
-     * @return self
      */
-    public function setType(int $_type): self
+    public function setType(int $type): self
     {
-        $this->_type = $_type;
+        $this->type = $type;
 
         return $this;
     }
@@ -370,23 +344,21 @@ class FileId
     /**
      * Get file reference.
      *
-     * @return string
      */
     public function getFileReference(): string
     {
-        return $this->_fileReference;
+        return $this->fileReference;
     }
 
     /**
      * Set file reference.
      *
-     * @param string $_fileReference File reference.
+     * @param string $fileReference File reference.
      *
-     * @return self
      */
-    public function setFileReference(string $_fileReference): self
+    public function setFileReference(string $fileReference): self
     {
-        $this->_fileReference = $_fileReference;
+        $this->fileReference = $fileReference;
 
         return $this;
     }
@@ -398,17 +370,16 @@ class FileId
      */
     public function hasFileReference(): bool
     {
-        return !empty($this->_fileReference);
+        return !empty($this->fileReference);
     }
 
     /**
      * Get file URL for weblocation.
      *
-     * @return string
      */
     public function getUrl(): string
     {
-        return $this->_url;
+        return $this->url;
     }
 
     /**
@@ -418,19 +389,18 @@ class FileId
      */
     public function hasUrl(): bool
     {
-        return !empty($this->_url);
+        return !empty($this->url);
     }
 
     /**
      * Set file URL for weblocation.
      *
-     * @param string $_url File URL for weblocation.
+     * @param string $url File URL for weblocation.
      *
-     * @return self
      */
-    public function setUrl(string $_url): self
+    public function setUrl(string $url): self
     {
-        $this->_url = $_url;
+        $this->url = $url;
 
         return $this;
     }
@@ -442,19 +412,18 @@ class FileId
      */
     public function getId()
     {
-        return $this->_id;
+        return $this->id;
     }
 
     /**
      * Set file id.
      *
-     * @param int $_id File id.
+     * @param int $id File id.
      *
-     * @return self
      */
-    public function setId($_id): self
+    public function setId(int $id): self
     {
-        $this->_id = $_id;
+        $this->id = $id;
 
         return $this;
     }
@@ -462,11 +431,10 @@ class FileId
     /**
      * Check if has file id.
      *
-     * @return bool
      */
     public function hasId(): bool
     {
-        return isset($this->_id);
+        return isset($this->id);
     }
 
     /**
@@ -476,19 +444,18 @@ class FileId
      */
     public function getAccessHash()
     {
-        return $this->_accessHash;
+        return $this->accessHash;
     }
 
     /**
      * Set file access hash.
      *
-     * @param int $_accessHash File access hash.
+     * @param int $accessHash File access hash.
      *
-     * @return self
      */
-    public function setAccessHash($_accessHash): self
+    public function setAccessHash(int $accessHash): self
     {
-        $this->_accessHash = $_accessHash;
+        $this->accessHash = $accessHash;
 
         return $this;
     }
@@ -500,19 +467,18 @@ class FileId
      */
     public function getVolumeId()
     {
-        return $this->_volumeId;
+        return $this->volumeId;
     }
 
     /**
      * Set photo volume ID.
      *
-     * @param int $_volumeId Photo volume ID.
+     * @param int $volumeId Photo volume ID.
      *
-     * @return self
      */
-    public function setVolumeId($_volumeId): self
+    public function setVolumeId(int $volumeId): self
     {
-        $this->_volumeId = $_volumeId;
+        $this->volumeId = $volumeId;
 
         return $this;
     }
@@ -523,29 +489,27 @@ class FileId
      */
     public function hasVolumeId(): bool
     {
-        return isset($this->_volumeId);
+        return isset($this->volumeId);
     }
 
     /**
      * Get photo local ID.
      *
-     * @return int
      */
     public function getLocalId(): int
     {
-        return $this->_localId;
+        return $this->localId;
     }
 
     /**
      * Set photo local ID.
      *
-     * @param int $_localId Photo local ID.
+     * @param int $localId Photo local ID.
      *
-     * @return self
      */
-    public function setLocalId(int $_localId): self
+    public function setLocalId(int $localId): self
     {
-        $this->_localId = $_localId;
+        $this->localId = $localId;
 
         return $this;
     }
@@ -557,29 +521,27 @@ class FileId
      */
     public function hasLocalId(): bool
     {
-        return isset($this->_localId);
+        return isset($this->localId);
     }
 
     /**
      * Get photo size source.
      *
-     * @return PhotoSizeSource
      */
     public function getPhotoSizeSource(): PhotoSizeSource
     {
-        return $this->_photoSizeSource;
+        return $this->photoSizeSource;
     }
 
     /**
      * Set photo size source.
      *
-     * @param PhotoSizeSource $_photoSizeSource Photo size source.
+     * @param PhotoSizeSource $photoSizeSource Photo size source.
      *
-     * @return self
      */
-    public function setPhotoSizeSource(PhotoSizeSource $_photoSizeSource): self
+    public function setPhotoSizeSource(PhotoSizeSource $photoSizeSource): self
     {
-        $this->_photoSizeSource = $_photoSizeSource;
+        $this->photoSizeSource = $photoSizeSource;
 
         return $this;
     }
@@ -591,29 +553,27 @@ class FileId
      */
     public function hasPhotoSizeSource(): bool
     {
-        return isset($this->_photoSizeSource);
+        return isset($this->photoSizeSource);
     }
 
     /**
      * Get dC ID.
      *
-     * @return int
      */
     public function getDcId(): int
     {
-        return $this->_dcId;
+        return $this->dcId;
     }
 
     /**
      * Set dC ID.
      *
-     * @param int $_dcId DC ID.
+     * @param int $dcId DC ID.
      *
-     * @return self
      */
-    public function setDcId(int $_dcId): self
+    public function setDcId(int $dcId): self
     {
-        $this->_dcId = $_dcId;
+        $this->dcId = $dcId;
 
         return $this;
     }

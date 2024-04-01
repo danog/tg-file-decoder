@@ -1,4 +1,4 @@
-<?php
+<?php declare(strict_types=1);
 /**
  * Photosize source class.
  *
@@ -30,16 +30,13 @@ class PhotoSizeSourceStickersetThumbnail extends PhotoSizeSource
     /**
      * Stickerset ID.
      *
-     * @var int
      */
-    private $_stickerSetId;
+    private int $stickerSetId;
     /**
      * Stickerset access hash.
      *
-     * @var int
      */
-    private $_stickerSetAccessHash;
-
+    private int $stickerSetAccessHash;
 
     /**
      * Get stickerset ID.
@@ -48,19 +45,18 @@ class PhotoSizeSourceStickersetThumbnail extends PhotoSizeSource
      */
     public function getStickerSetId()
     {
-        return $this->_stickerSetId;
+        return $this->stickerSetId;
     }
 
     /**
      * Set stickerset ID.
      *
-     * @param int $_stickerSetId Stickerset ID
+     * @param int $stickerSetId Stickerset ID
      *
-     * @return self
      */
-    public function setStickerSetId($_stickerSetId): self
+    public function setStickerSetId(int $stickerSetId): self
     {
-        $this->_stickerSetId = $_stickerSetId;
+        $this->stickerSetId = $stickerSetId;
 
         return $this;
     }
@@ -72,19 +68,18 @@ class PhotoSizeSourceStickersetThumbnail extends PhotoSizeSource
      */
     public function getStickerSetAccessHash()
     {
-        return $this->_stickerSetAccessHash;
+        return $this->stickerSetAccessHash;
     }
 
     /**
      * Set stickerset access hash.
      *
-     * @param int $_stickerSetAccessHash Stickerset access hash
+     * @param int $stickerSetAccessHash Stickerset access hash
      *
-     * @return self
      */
-    public function setStickerSetAccessHash($_stickerSetAccessHash): self
+    public function setStickerSetAccessHash(int $stickerSetAccessHash): self
     {
-        $this->_stickerSetAccessHash = $_stickerSetAccessHash;
+        $this->stickerSetAccessHash = $stickerSetAccessHash;
 
         return $this;
     }

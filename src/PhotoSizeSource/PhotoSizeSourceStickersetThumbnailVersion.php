@@ -1,4 +1,4 @@
-<?php
+<?php declare(strict_types=1);
 /**
  * Photosize source class.
  *
@@ -30,22 +30,18 @@ class PhotoSizeSourceStickersetThumbnailVersion extends PhotoSizeSource
     /**
      * Stickerset ID.
      *
-     * @var int
      */
-    private $_stickerSetId;
+    private int $stickerSetId;
     /**
      * Stickerset access hash.
      *
-     * @var int
      */
-    private $_stickerSetAccessHash;
+    private int $stickerSetAccessHash;
     /**
      * Stickerset version.
      *
-     * @var int
      */
-    private $_stickerSetVersion;
-
+    private int $stickerSetVersion;
 
     /**
      * Get stickerset ID.
@@ -54,19 +50,18 @@ class PhotoSizeSourceStickersetThumbnailVersion extends PhotoSizeSource
      */
     public function getStickerSetId()
     {
-        return $this->_stickerSetId;
+        return $this->stickerSetId;
     }
 
     /**
      * Set stickerset ID.
      *
-     * @param int $_stickerSetId Stickerset ID
+     * @param int $stickerSetId Stickerset ID
      *
-     * @return self
      */
-    public function setStickerSetId($_stickerSetId): self
+    public function setStickerSetId(int $stickerSetId): self
     {
-        $this->_stickerSetId = $_stickerSetId;
+        $this->stickerSetId = $stickerSetId;
 
         return $this;
     }
@@ -78,19 +73,18 @@ class PhotoSizeSourceStickersetThumbnailVersion extends PhotoSizeSource
      */
     public function getStickerSetAccessHash()
     {
-        return $this->_stickerSetAccessHash;
+        return $this->stickerSetAccessHash;
     }
 
     /**
      * Set stickerset access hash.
      *
-     * @param int $_stickerSetAccessHash Stickerset access hash
+     * @param int $stickerSetAccessHash Stickerset access hash
      *
-     * @return self
      */
-    public function setStickerSetAccessHash($_stickerSetAccessHash): self
+    public function setStickerSetAccessHash(int $stickerSetAccessHash): self
     {
-        $this->_stickerSetAccessHash = $_stickerSetAccessHash;
+        $this->stickerSetAccessHash = $stickerSetAccessHash;
 
         return $this;
     }
@@ -98,23 +92,21 @@ class PhotoSizeSourceStickersetThumbnailVersion extends PhotoSizeSource
     /**
      * Get stickerset version.
      *
-     * @return int
      */
     public function getStickerSetVersion(): int
     {
-        return $this->_stickerSetVersion;
+        return $this->stickerSetVersion;
     }
 
     /**
      * Set stickerset version.
      *
-     * @param int $_stickerSetVersion Stickerset version.
+     * @param int $stickerSetVersion Stickerset version.
      *
-     * @return self
      */
-    public function setStickerSetVersion(int $_stickerSetVersion): self
+    public function setStickerSetVersion(int $stickerSetVersion): self
     {
-        $this->_stickerSetVersion = $_stickerSetVersion;
+        $this->stickerSetVersion = $stickerSetVersion;
 
         return $this;
     }

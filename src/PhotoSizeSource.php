@@ -1,4 +1,4 @@
-<?php
+<?php declare(strict_types=1);
 /**
  * Photosize source class.
  *
@@ -30,9 +30,8 @@ abstract class PhotoSizeSource
     /**
      * Source type.
      *
-     * @var int
      */
-    private $_type;
+    private int $type;
 
     /**
      * Set photosize source type.
@@ -41,7 +40,7 @@ abstract class PhotoSizeSource
      */
     public function __construct(int $type)
     {
-        $this->_type = $type;
+        $this->type = $type;
 
         return $this;
     }
@@ -65,6 +64,6 @@ abstract class PhotoSizeSource
      */
     public function getType(): int
     {
-        return $this->_type;
+        return $this->type;
     }
 }

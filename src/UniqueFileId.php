@@ -1,4 +1,4 @@
-<?php
+<?php declare(strict_types=1);
 /**
  * Decoded UniqueFileId class.
  *
@@ -30,51 +30,43 @@ class UniqueFileId
     /**
      * File type.
      *
-     * @var int
      */
-    private $_type = NONE;
+    private int $type = NONE;
     /**
      * File ID.
      *
-     * @var int
      */
-    private $_id;
+    private int $id;
     /**
      * Photo volume ID.
      *
-     * @var int
      */
-    private $_volumeId;
+    private int $volumeId;
     /**
      * Photo local ID.
      *
-     * @var int
      */
-    private $_localId;
+    private int $localId;
     /**
      * Photo subtype.
      *
-     * @var int
      */
-    private $_subType;
+    private int $subType;
     /**
      * Sticker set ID.
      *
-     * @var int
      */
-    private $_stickerSetId;
+    private int $stickerSetId;
     /**
      * Sticker set version.
      *
-     * @var int
      */
-    private $_stickerSetVersion;
+    private int $stickerSetVersion;
     /**
      * Weblocation URL.
      *
-     * @var string
      */
-    private $_url;
+    private string $url;
     /**
      * Basic constructor function.
      */
@@ -85,7 +77,6 @@ class UniqueFileId
     /**
      * Get unique bot API file ID.
      *
-     * @return string
      */
     public function __toString(): string
     {
@@ -95,7 +86,6 @@ class UniqueFileId
     /**
      * Get unique bot API file ID.
      *
-     * @return string
      */
     public function getUniqueBotAPI(): string
     {
@@ -126,7 +116,6 @@ class UniqueFileId
      *
      * @param string $fileId Bot API file ID
      *
-     * @return self
      */
     public static function fromUniqueBotAPI(string $fileId): self
     {
@@ -159,7 +148,6 @@ class UniqueFileId
      *
      * @param string $fileId Full bot API file ID
      *
-     * @return self
      */
     public static function fromBotAPI(string $fileId): self
     {
@@ -171,7 +159,6 @@ class UniqueFileId
      *
      * @param FileId $fileId Full file ID
      *
-     * @return self
      */
     public static function fromFileId(FileId $fileId): self
     {
@@ -217,33 +204,30 @@ class UniqueFileId
     /**
      * Get unique file type as string.
      *
-     * @return string
      */
     public function getTypeName(): string
     {
-        return UNIQUE_TYPES[$this->_type];
+        return UNIQUE_TYPES[$this->type];
     }
 
     /**
      * Get unique file type.
      *
-     * @return int
      */
     public function getType(): int
     {
-        return $this->_type;
+        return $this->type;
     }
 
     /**
      * Set file type.
      *
-     * @param int $_type File type.
+     * @param int $type File type.
      *
-     * @return self
      */
-    public function setType(int $_type): self
+    public function setType(int $type): self
     {
-        $this->_type = $_type;
+        $this->type = $type;
 
         return $this;
     }
@@ -255,19 +239,18 @@ class UniqueFileId
      */
     public function getId()
     {
-        return $this->_id;
+        return $this->id;
     }
 
     /**
      * Set file ID.
      *
-     * @param int $_id File ID.
+     * @param int $id File ID.
      *
-     * @return self
      */
-    public function setId($_id): self
+    public function setId(int $id): self
     {
-        $this->_id = $_id;
+        $this->id = $id;
 
         return $this;
     }
@@ -279,9 +262,8 @@ class UniqueFileId
      */
     public function hasId(): bool
     {
-        return isset($this->_id);
+        return isset($this->id);
     }
-
 
     /**
      * Get photo volume ID.
@@ -290,19 +272,18 @@ class UniqueFileId
      */
     public function getVolumeId()
     {
-        return $this->_volumeId;
+        return $this->volumeId;
     }
 
     /**
      * Set photo volume ID.
      *
-     * @param int $_volumeId Photo volume ID.
+     * @param int $volumeId Photo volume ID.
      *
-     * @return self
      */
-    public function setVolumeId($_volumeId): self
+    public function setVolumeId(int $volumeId): self
     {
-        $this->_volumeId = $_volumeId;
+        $this->volumeId = $volumeId;
 
         return $this;
     }
@@ -313,29 +294,27 @@ class UniqueFileId
      */
     public function hasVolumeId(): bool
     {
-        return isset($this->_volumeId);
+        return isset($this->volumeId);
     }
 
     /**
      * Get photo local ID.
      *
-     * @return int
      */
     public function getLocalId(): int
     {
-        return $this->_localId;
+        return $this->localId;
     }
 
     /**
      * Set photo local ID.
      *
-     * @param int $_localId Photo local ID.
+     * @param int $localId Photo local ID.
      *
-     * @return self
      */
-    public function setLocalId(int $_localId): self
+    public function setLocalId(int $localId): self
     {
-        $this->_localId = $_localId;
+        $this->localId = $localId;
 
         return $this;
     }
@@ -347,30 +326,27 @@ class UniqueFileId
      */
     public function hasLocalId(): bool
     {
-        return isset($this->_localId);
+        return isset($this->localId);
     }
-
 
     /**
      * Get weblocation URL.
      *
-     * @return string
      */
     public function getUrl(): string
     {
-        return $this->_url;
+        return $this->url;
     }
 
     /**
      * Set weblocation URL.
      *
-     * @param string $_url Weblocation URL
+     * @param string $url Weblocation URL
      *
-     * @return self
      */
-    public function setUrl(string $_url): self
+    public function setUrl(string $url): self
     {
-        $this->_url = $_url;
+        $this->url = $url;
 
         return $this;
     }
@@ -382,39 +358,36 @@ class UniqueFileId
      */
     public function hasUrl(): bool
     {
-        return isset($this->_url);
+        return isset($this->url);
     }
 
     /**
      * Get photo subtype.
      *
-     * @return int
      */
     public function getSubType(): int
     {
-        return $this->_subType;
+        return $this->subType;
     }
 
     /**
      * Has photo subtype?
      *
-     * @return bool
      */
     public function hasSubType(): bool
     {
-        return isset($this->_subType);
+        return isset($this->subType);
     }
 
     /**
      * Set photo subtype.
      *
-     * @param int $_subType Photo subtype
+     * @param int $subType Photo subtype
      *
-     * @return self
      */
-    public function setSubType(int $_subType): self
+    public function setSubType(int $subType): self
     {
-        $this->_subType = $_subType;
+        $this->subType = $subType;
 
         return $this;
     }
@@ -426,30 +399,27 @@ class UniqueFileId
      */
     public function getStickerSetId()
     {
-        return $this->_stickerSetId;
+        return $this->stickerSetId;
     }
-
 
     /**
      * Has sticker set ID?
      *
-     * @return bool
      */
     public function hasStickerSetId(): bool
     {
-        return isset($this->_stickerSetId);
+        return isset($this->stickerSetId);
     }
 
     /**
      * Set sticker set ID.
      *
-     * @param int $_stickerSetId Sticker set ID
+     * @param int $stickerSetId Sticker set ID
      *
-     * @return self
      */
-    public function setStickerSetId($_stickerSetId): self
+    public function setStickerSetId(int $stickerSetId): self
     {
-        $this->_stickerSetId = $_stickerSetId;
+        $this->stickerSetId = $stickerSetId;
 
         return $this;
     }
@@ -457,33 +427,30 @@ class UniqueFileId
     /**
      * Get sticker set version.
      *
-     * @return int
      */
     public function getStickerSetVersion(): int
     {
-        return $this->_stickerSetVersion;
+        return $this->stickerSetVersion;
     }
 
     /**
      * Has sticker set version.
      *
-     * @return bool
      */
     public function hasStickerSetVersion(): bool
     {
-        return isset($this->_stickerSetVersion);
+        return isset($this->stickerSetVersion);
     }
 
     /**
      * Set sticker set version.
      *
-     * @param int $_stickerSetVersion Sticker set version
+     * @param int $stickerSetVersion Sticker set version
      *
-     * @return self
      */
-    public function setStickerSetVersion(int $_stickerSetVersion): self
+    public function setStickerSetVersion(int $stickerSetVersion): self
     {
-        $this->_stickerSetVersion = $_stickerSetVersion;
+        $this->stickerSetVersion = $stickerSetVersion;
 
         return $this;
     }

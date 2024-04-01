@@ -1,4 +1,4 @@
-<?php
+<?php declare(strict_types=1);
 /**
  * Photosize source class.
  *
@@ -30,9 +30,8 @@ class PhotoSizeSourceLegacy extends PhotoSizeSource
     /**
      * Secret legacy ID.
      *
-     * @var int
      */
-    private $_secret;
+    private int $secret;
 
     /**
      * Get secret legacy ID.
@@ -41,19 +40,18 @@ class PhotoSizeSourceLegacy extends PhotoSizeSource
      */
     public function getSecret()
     {
-        return $this->_secret;
+        return $this->secret;
     }
 
     /**
      * Set secret legacy ID.
      *
-     * @param int $_secret Secret legacy ID
+     * @param int $secret Secret legacy ID
      *
-     * @return self
      */
-    public function setSecret($_secret): self
+    public function setSecret(int $secret): self
     {
-        $this->_secret = $_secret;
+        $this->secret = $secret;
 
         return $this;
     }
