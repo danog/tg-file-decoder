@@ -108,13 +108,12 @@ Click [here &raquo;](https://github.com/danog/tg-file-decoder/blob/master/docs/i
 ### Building custom file IDs
 
 ```php
-$fileId = new FileId;
-
-$fileId->setType(STICKER);
-$fileId->setId($id);
-$fileId->setAccessHash($customHash);
-
-// You get it...
+$fileId = new FileId(
+    type: FileIdType::STICKER,
+    id: $id,
+    accessHash: $accessHash,
+    // and so on...
+);
 
 $encoded = (string) $fileId; // CAACAgQAAxkDAAJEsl44nl3yxPZ8biI8uhaA7rbQceOSAAKtAQACsTisUXvMEbVnTuQkGAQ, or something
 ```
