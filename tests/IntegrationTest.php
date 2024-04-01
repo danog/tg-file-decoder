@@ -4,38 +4,36 @@ namespace danog\Decoder\Test;
 
 use CURLFile;
 use danog\Decoder\FileId;
+use danog\Decoder\FileIdType;
 use danog\Decoder\UniqueFileId;
 use PHPUnit\Framework\TestCase;
 
-use const danog\Decoder\FULL_UNIQUE_MAP;
-use const danog\Decoder\TYPES_IDS;
-
+/** @api */
 class IntegrationTest extends TestCase
 {
     /**
-     * @param string $type   Expected type
-     *
      * @dataProvider provideFileIdsAndType
      */
-    public function testAll(string $type, string $fileIdStr, string $uniqueFileIdStr)
+    public function testAll(FileIdType $type, string $fileIdStr, string $uniqueFileIdStr): void
     {
         $fileId = FileId::fromBotAPI($fileIdStr);
-        $this->assertSame($type, $fileId->getTypeName());
+        $this->assertSame($type, $fileId->type);
 
         $this->assertSame($fileIdStr, $fileId->getBotAPI());
 
         $uniqueFileId = UniqueFileId::fromUniqueBotAPI($uniqueFileIdStr);
-        $this->assertSame(FULL_UNIQUE_MAP[TYPES_IDS[$type]], $uniqueFileId->getType());
+        $this->assertSame($type->toUnique(), $uniqueFileId->type);
         $this->assertSame($uniqueFileIdStr, $uniqueFileId->getUniqueBotAPI());
 
         $this->assertSame($uniqueFileIdStr, $fileId->getUnique()->getUniqueBotAPI());
     }
 
+    /** @psalm-suppress MixedArrayAccess, MixedAssignment, PossiblyInvalidArgument, MixedArgument */
     public function provideFileIdsAndType(): \Generator
     {
         foreach (['CAADBAADwwADmFmqDf6xBrPTReqHFgQ', 'CAACAgQAAxkBAAIC4l9CWDGzVUcDejU0TETLWbOdfsCoAALDAAOYWaoN_rEGs9NF6ocbBA', 'CAADBAADwwADmFmqDf6xBrPTReqHAg'] as $fileId) {
             yield [
-                'sticker',
+                FileIdType::STICKER,
                 $fileId,
                 'AgADwwADmFmqDQ'
             ];
@@ -44,14 +42,22 @@ class IntegrationTest extends TestCase
         $dest = \getenv('DEST');
         $token = \getenv('TOKEN');
         foreach ($this->provideChats() as $chat) {
+            /**
+             * @var array{
+             *      small_file_id: string,
+             *      small_file_unique_id: string,
+             *      big_file_id: string,
+             *      big_file_unique_id: string
+             * }
+             */
             $result = \json_decode(\file_get_contents("https://api.telegram.org/bot$token/getChat?chat_id=$chat"), true)['result']['photo'];
             yield [
-                'profile_photo',
+                FileIdType::PROFILE_PHOTO,
                 $result['small_file_id'],
                 $result['small_file_unique_id'],
             ];
             yield [
-                'profile_photo',
+                FileIdType::fromBotApiType('profile_photo'),
                 $result['big_file_id'],
                 $result['big_file_unique_id'],
             ];
@@ -78,14 +84,15 @@ class IntegrationTest extends TestCase
                 $botResult = [$botResult];
             }
             foreach ($botResult as $subResult) {
+                /** @var string $type */
                 yield [
-                    $type,
+                    FileIdType::fromBotApiType($type),
                     $subResult['file_id'],
                     $subResult['file_unique_id']
                 ];
                 if (isset($subResult['thumb'])) {
                     yield [
-                        'thumbnail',
+                        FileIdType::fromBotApiType('thumbnail'),
                         $subResult['thumb']['file_id'],
                         $subResult['thumb']['file_unique_id']
                     ];
@@ -93,6 +100,10 @@ class IntegrationTest extends TestCase
             }
         }
     }
+    /**
+     * @psalm-suppress InvalidReturnStatement, InvalidReturnType
+     * @return list<string>
+     */
     public function provideChats(): array
     {
         return [\getenv('DEST'), '@MadelineProto'];

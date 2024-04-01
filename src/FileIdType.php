@@ -98,6 +98,30 @@ enum FileIdType: int
     case SIZE = 17;
     case NONE = 18;
 
+    public static function fromBotApiType(string $type): self
+    {
+        return match ($type) {
+            'thumbnail' => self::THUMBNAIL,
+            'profile_photo' => self::PROFILE_PHOTO,
+            'photo' => self::PHOTO,
+            'voice' => self::VOICE,
+            'video' => self::VIDEO,
+            'document' => self::DOCUMENT,
+            'encrypted' => self::ENCRYPTED,
+            'temp' => self::TEMP,
+            'sticker' => self::STICKER,
+            'audio' => self::AUDIO,
+            'animation' => self::ANIMATION,
+            'encrypted_thumbnail' => self::ENCRYPTED_THUMBNAIL,
+            'wallpaper' => self::WALLPAPER,
+            'video_note' => self::VIDEO_NOTE,
+            'secure_raw' => self::SECURE_RAW,
+            'secure' => self::SECURE,
+            'background' => self::BACKGROUND,
+            'size' => self::SIZE,
+        };
+    }
+
     /**
      * Convert file ID type to unique file ID type.
      */
