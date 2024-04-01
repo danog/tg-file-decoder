@@ -159,8 +159,9 @@ final class FileId
                 $local_id = Tools::unpackInt($read(4));
             }
 
-            /** @psalm-suppress MixedArgument */
-            $photosize_source = PhotoSizeSourceType::from($subVersion >= 4 ? \unpack('V', $read(4))[1] : 0);
+            /** @var int */
+            $arg = $subVersion >= 4 ? \unpack('V', $read(4))[1] : 0;
+            $photosize_source = PhotoSizeSourceType::from($arg);
             switch ($photosize_source) {
                 case PhotoSizeSourceType::LEGACY:
                     $photoSizeSource = new PhotoSizeSourceLegacy(Tools::unpackLong($read(8)));

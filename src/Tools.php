@@ -19,7 +19,7 @@ final class Tools
      */
     public static function unpackLong(string $field): int
     {
-        /** @psalm-suppress MixedReturnStatement */
+        /** @var int */
         return \unpack('q', BIG_ENDIAN ? \strrev($field) : $field)[1];
     }
     /**
@@ -30,7 +30,7 @@ final class Tools
      */
     public static function unpackInt(string $field): int
     {
-        /** @psalm-suppress MixedReturnStatement */
+        /** @var int */
         return \unpack('l', $field)[1];
     }
     /**

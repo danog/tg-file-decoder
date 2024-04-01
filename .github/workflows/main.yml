@@ -44,6 +44,6 @@ jobs:
           TOKEN: ${{ secrets.TOKEN }}
           DEST: ${{ secrets.DEST }}
         run: |
-          vendor/bin/psalm --no-cache
+          vendor/bin/psalm --no-cache --shepherd
           vendor/bin/phpunit --coverage-text --coverage-clover build/logs/clover.xml
           vendor/bin/php-cs-fixer --diff --dry-run -v fix
