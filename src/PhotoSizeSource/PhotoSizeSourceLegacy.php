@@ -24,37 +24,11 @@ use danog\Decoder\PhotoSizeSource;
  * Represents source of photosize.
  *
  * @api
- *
- * @extends PhotoSizeSource<PhotoSizeSourceLegacy>
  */
 final class PhotoSizeSourceLegacy extends PhotoSizeSource
 {
-    /**
-     * Secret legacy ID.
-     *
-     */
-    private int $secret;
-
-    /**
-     * Get secret legacy ID.
-     *
-     * @return int
-     */
-    public function getSecret()
-    {
-        return $this->secret;
-    }
-
-    /**
-     * Set secret legacy ID.
-     *
-     * @param int $secret Secret legacy ID
-     *
-     */
-    public function setSecret(int $secret): self
-    {
-        $this->secret = $secret;
-
-        return $this;
+    public function __construct(
+        public readonly int $secret,
+    ) {
     }
 }

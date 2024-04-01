@@ -18,50 +18,9 @@
 
 namespace danog\Decoder;
 
-use danog\Decoder\PhotoSizeSource\PhotoSizeSourceLegacy;
-
 /**
  * Represents source of photosize.
- *
- * @template T
  */
 abstract class PhotoSizeSource
 {
-    /**
-     * Source type.
-     *
-     */
-    private PhotoSizeSourceType $type;
-
-    /**
-     * Set photosize source type.
-     *
-     * @param PhotoSizeSourceType $type Type
-     */
-    public function __construct(PhotoSizeSourceType $type)
-    {
-        $this->type = $type;
-    }
-    /**
-     * Get photosize source type.
-     *
-     * @return integer
-     *
-     * @psalm-return (
-     *     T is PhotoSizeSourceLegacy ?
-     *     ? \danog\Decoder\PhotoSizeSourceType::LEGACY
-     *     : (T is PhotoSizeSourceDialogPhoto
-     *       ? \danog\Decoder\PhotoSizeSourceType::DIALOGPHOTO_*
-     *       (T is PhotoSizeSourceStickersetThumbnail
-     *         ? \danog\Decoder\PhotoSizeSourceType::STICKERSET_THUMBNAIL
-     *         : \danog\Decoder\PhotoSizeSourceType::THUMBNAIL
-     *       )
-     *     )
-     *
-     * @internal Internal use
-     */
-    public function getType(): PhotoSizeSourceType
-    {
-        return $this->type;
-    }
 }

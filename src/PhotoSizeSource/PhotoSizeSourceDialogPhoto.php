@@ -19,77 +19,22 @@
 namespace danog\Decoder\PhotoSizeSource;
 
 use danog\Decoder\PhotoSizeSource;
-use danog\Decoder\PhotoSizeSourceType;
 
 /**
  * Represents source of photosize.
  *
  * @api
- *
- * @extends PhotoSizeSource<PhotoSizeSourceDialogPhoto>
  */
-final class PhotoSizeSourceDialogPhoto extends PhotoSizeSource
+abstract class PhotoSizeSourceDialogPhoto extends PhotoSizeSource
 {
-    /**
-     * ID of dialog.
-     *
-     */
-    private int $dialogId;
-    /**
-     * Access hash of dialog.
-     *
-     */
-    private int $dialogAccessHash;
-
-    /**
-     * Get dialog ID.
-     *
-     * @return int
-     */
-    public function getDialogId()
-    {
-        return $this->dialogId;
+    public function __construct(
+        public readonly int $dialogId,
+        public readonly int $dialogAccessHash,
+    ) {
     }
-    /**
-     * Set dialog ID.
-     *
-     * @param int $id Dialog ID
-     *
-     */
-    public function setDialogId(int $id): self
-    {
-        $this->dialogId = $id;
-        return $this;
-    }
-    /**
-     * Get access hash of dialog.
-     *
-     * @return int
-     */
-    public function getDialogAccessHash()
-    {
-        return $this->dialogAccessHash;
-    }
-
-    /**
-     * Set access hash of dialog.
-     *
-     * @param int $dialogAccessHash Access hash of dialog
-     *
-     */
-    public function setDialogAccessHash(int $dialogAccessHash): self
-    {
-        $this->dialogAccessHash = $dialogAccessHash;
-
-        return $this;
-    }
-
     /**
      * Get whether the big or small version of the photo is being used.
      *
      */
-    public function isSmallDialogPhoto(): bool
-    {
-        return \in_array($this->getType(), [PhotoSizeSourceType::DIALOGPHOTO_SMALL_LEGACY, PhotoSizeSourceType::DIALOGPHOTO_SMALL], true);
-    }
+    abstract public function isSmallDialogPhoto(): bool;
 }

@@ -19,6 +19,8 @@
 namespace danog\Decoder;
 
 use danog\Decoder\PhotoSizeSource\PhotoSizeSourceDialogPhoto;
+use danog\Decoder\PhotoSizeSource\PhotoSizeSourceDialogPhotoBig;
+use danog\Decoder\PhotoSizeSource\PhotoSizeSourceDialogPhotoSmall;
 use danog\Decoder\PhotoSizeSource\PhotoSizeSourceLegacy;
 use danog\Decoder\PhotoSizeSource\PhotoSizeSourceStickersetThumbnail;
 use danog\Decoder\PhotoSizeSource\PhotoSizeSourceStickersetThumbnailVersion;
@@ -32,72 +34,72 @@ use danog\Decoder\PhotoSizeSource\PhotoSizeSourceThumbnail;
 final class FileId
 {
     /**
-     * Bot API file ID version.
-     *
-     */
-    private int $version = 4;
-
-    /**
-     * Bot API file ID subversion.
-     *
-     */
-    private int $subVersion = 47;
-
-    /**
-     * DC ID.
-     *
-     */
-    private int $dcId = 0;
-
-    /**
-     * File type.
-     *
-     */
-    private FileIdType $type = FileIdType::NONE;
-
-    /**
-     * File reference.
-     *
-     */
-    private string $fileReference = '';
-    /**
-     * File URL for weblocation.
-     *
-     */
-    private string $url = '';
-
-    /**
-     * File id.
-     *
-     */
-    private int $id;
-    /**
-     * File access hash.
-     *
-     */
-    private int $accessHash;
-
-    /**
-     * Photo volume ID.
-     *
-     */
-    private int $volumeId;
-    /**
-     * Photo local ID.
-     *
-     */
-    private int $localId;
-
-    /**
-     * Photo size source.
-     *
-     */
-    private PhotoSizeSource $photoSizeSource;
-    /**
      * Basic constructor function.
      */
-    public function __construct()
-    {
+    public function __construct(
+        /**
+         * DC ID.
+         *
+         */
+        public readonly int $dcId,
+
+        /**
+         * File type.
+         *
+         */
+        public readonly FileIdType $type,
+
+        /**
+         * File id.
+         *
+         */
+        public readonly ?int $id,
+        /**
+         * File access hash.
+         *
+         */
+        public readonly int $accessHash,
+
+        /**
+         * Photo size source.
+         *
+         */
+        public readonly ?PhotoSizeSource $photoSizeSource = null,
+
+        /**
+         * Photo volume ID.
+         *
+         */
+        public readonly ?int $volumeId = null,
+        /**
+         * Photo local ID.
+         *
+         */
+        public readonly ?int $localId = null,
+
+        /**
+         * File reference.
+         *
+         */
+        public readonly ?string $fileReference = null,
+        /**
+         * File URL for weblocation.
+         *
+         */
+        public readonly ?string $url = null,
+
+        /**
+         * Bot API file ID version.
+         *
+         */
+        public readonly int $version = 4,
+
+        /**
+         * Bot API file ID subversion.
+         *
+         */
+        public readonly int $subVersion = 47,
+    ) {
     }
 
     /**
@@ -108,66 +110,139 @@ final class FileId
      */
     public static function fromBotAPI(string $fileId): self
     {
-        $result = new self;
-        $resultArray = internalDecode($fileId);
-        $result->setVersion($resultArray['version']);
-        $result->setSubVersion($resultArray['subVersion']);
-        $result->setType($resultArray['typeId']);
-        $result->setDcId($resultArray['dc_id']);
-        $result->setAccessHash($resultArray['access_hash']);
+        $orig = $fileId;
+        $fileId = rleDecode(base64urlDecode($fileId));
+        $version = \ord($fileId[\strlen($fileId) - 1]);
+        $subVersion = $version === 4 ? \ord($fileId[\strlen($fileId) - 2]) : 0;
 
-        if ($resultArray['hasReference']) {
-            $result->setFileReference($resultArray['fileReference']);
-        }
-        if ($resultArray['hasWebLocation']) {
-            $result->setUrl($resultArray['url']);
-            return $result;
-        }
-        $result->setId($resultArray['id']);
+        $res = \fopen('php://memory', 'rw+b');
+        \assert($res !== false);
+        \fwrite($res, $fileId);
+        \fseek($res, 0);
+        $fileId = $res;
+        $read = function (int $length) use (&$fileId): string {
+            $res = \stream_get_contents($fileId, $length);
+            \assert($res !== false);
+            return $res;
+        };
 
-        if ($result->getType()->value <= FileIdType::PHOTO->value) {
-            if (isset($resultArray['volume_id'])) {
-                $result->setVolumeId($resultArray['volume_id']);
+        $typeId = unpackInt($read(4));
+        $dc_id = unpackInt($read(4));
+        $fileReference = $typeId & FILE_REFERENCE_FLAG ? readTLString($fileId) : null;
+        $hasWebLocation = (bool) ($typeId & WEB_LOCATION_FLAG);
+        $typeId &= ~FILE_REFERENCE_FLAG;
+        $typeId &= ~WEB_LOCATION_FLAG;
+
+        if ($hasWebLocation) {
+            $url = readTLString($fileId);
+            $access_hash = unpackLong($read(8));
+            return new self(
+                $dc_id,
+                FileIdType::from($typeId),
+                null,
+                $access_hash,
+                fileReference: $fileReference,
+                url: $url,
+                version: $version,
+                subVersion: $subVersion
+            );
+        }
+        $id = unpackLong($read(8));
+        $access_hash = unpackLong($read(8));
+
+        $volume_id = null;
+        $local_id = null;
+        $photoSizeSource = null;
+        if ($typeId <= FileIdType::PHOTO->value) {
+            if ($subVersion < 32) {
+                $volume_id = unpackLong($read(8));
+                $local_id = unpackInt($read(4));
             }
-            if (isset($resultArray['local_id'])) {
-                $result->setLocalId($resultArray['local_id']);
-            }
-            switch ($resultArray['photosize_source']) {
+
+            /** @psalm-suppress MixedArgument */
+            $photosize_source = PhotoSizeSourceType::from($subVersion >= 4 ? \unpack('V', $read(4))[1] : 0);
+            switch ($photosize_source) {
                 case PhotoSizeSourceType::LEGACY:
+                    $photoSizeSource = new PhotoSizeSourceLegacy(unpackLong($read(8)));
+                    break;
                 case PhotoSizeSourceType::FULL_LEGACY:
-                    $photoSizeSource = new PhotoSizeSourceLegacy($resultArray['photosize_source']);
-                    $photoSizeSource->setSecret($resultArray['secret']);
+                    $volume_id = unpackLong($read(8));
+                    $photoSizeSource = new PhotoSizeSourceLegacy(unpackLong($read(8)));
+                    $local_id = unpackInt($read(4));
                     break;
                 case PhotoSizeSourceType::THUMBNAIL:
-                    $photoSizeSource = new PhotoSizeSourceThumbnail($resultArray['photosize_source']);
-                    $photoSizeSource->setThumbType($resultArray['thumbnail_type']);
-                    $photoSizeSource->setThumbFileType($resultArray['file_type']);
+                    /** @var array{file_type: int, thumbnail_type: string} */
+                    $result = \unpack('Vfile_type/athumbnail_type', $read(8));
+                    $photoSizeSource = new PhotoSizeSourceThumbnail(
+                        FileIdType::from($result['file_type']),
+                        $result['thumbnail_type']
+                    );
+                    break;
+                case PhotoSizeSourceType::DIALOGPHOTO_BIG:
+                case PhotoSizeSourceType::DIALOGPHOTO_SMALL:
+                    $clazz = $photosize_source === PhotoSizeSourceType::DIALOGPHOTO_SMALL
+                        ? PhotoSizeSourceDialogPhotoSmall::class
+                        : PhotoSizeSourceDialogPhotoBig::class;
+                    $photoSizeSource = new $clazz(
+                        unpackLong($read(8)),
+                        unpackLong($read(8)),
+                    );
+                    break;
+                case PhotoSizeSourceType::STICKERSET_THUMBNAIL:
+                    $photoSizeSource = new PhotoSizeSourceStickersetThumbnail(
+                        unpackLong($read(8)),
+                        unpackLong($read(8))
+                    );
                     break;
                 case PhotoSizeSourceType::DIALOGPHOTO_BIG_LEGACY:
                 case PhotoSizeSourceType::DIALOGPHOTO_SMALL_LEGACY:
-                case PhotoSizeSourceType::DIALOGPHOTO_BIG:
-                case PhotoSizeSourceType::DIALOGPHOTO_SMALL:
-                    $photoSizeSource = new PhotoSizeSourceDialogPhoto($resultArray['photosize_source']);
-                    $photoSizeSource->setDialogId($resultArray['dialog_id']);
-                    $photoSizeSource->setDialogAccessHash($resultArray['dialog_access_hash']);
+                    $clazz = $photosize_source === PhotoSizeSourceType::DIALOGPHOTO_SMALL_LEGACY
+                        ? PhotoSizeSourceDialogPhotoSmall::class
+                        : PhotoSizeSourceDialogPhotoBig::class;
+                    $photoSizeSource = new $clazz(
+                        unpackLong($read(8)),
+                        unpackLong($read(8))
+                    );
+
+                    $volume_id = unpackLong($read(8));
+                    $local_id = unpackInt($read(4));
                     break;
-                case PhotoSizeSourceType::STICKERSET_THUMBNAIL:
                 case PhotoSizeSourceType::STICKERSET_THUMBNAIL_LEGACY:
-                    $photoSizeSource = new PhotoSizeSourceStickersetThumbnail($resultArray['photosize_source']);
-                    $photoSizeSource->setStickerSetId($resultArray['sticker_set_id']);
-                    $photoSizeSource->setStickerSetAccessHash($resultArray['sticker_set_access_hash']);
+                    $photoSizeSource = new PhotoSizeSourceStickersetThumbnail(
+                        unpackLong($read(8)),
+                        unpackLong($read(8)),
+                    );
+
+                    $volume_id = unpackLong($read(8));
+                    $local_id = unpackInt($read(4));
                     break;
                 case PhotoSizeSourceType::STICKERSET_THUMBNAIL_VERSION:
-                    $photoSizeSource = new PhotoSizeSourceStickersetThumbnailVersion($resultArray['photosize_source']);
-                    $photoSizeSource->setStickerSetId($resultArray['sticker_set_id']);
-                    $photoSizeSource->setStickerSetAccessHash($resultArray['sticker_set_access_hash']);
-                    $photoSizeSource->setStickerSetVersion($resultArray['sticker_version']);
+                    $photoSizeSource = new PhotoSizeSourceStickersetThumbnailVersion(
+                        unpackLong($read(8)),
+                        unpackLong($read(8)),
+                        unpackInt($read(4))
+                    );
                     break;
             }
-            $result->setPhotoSizeSource($photoSizeSource);
+        }
+        $l = \fstat($fileId)['size'] - \ftell($fileId);
+        $l -= $version >= 4 ? 2 : 1;
+        if ($l > 0) {
+            \trigger_error("File ID $orig has $l bytes of leftover data");
         }
 
-        return $result;
+        return new self(
+            dcId: $dc_id,
+            type: FileIdType::from($typeId),
+            id: $id,
+            accessHash: $access_hash,
+            volumeId: $volume_id,
+            localId: $local_id,
+            fileReference: $fileReference,
+            version: $version,
+            subVersion: $subVersion,
+            photoSizeSource: $photoSizeSource,
+        );
     }
 
     /**
@@ -176,76 +251,86 @@ final class FileId
      */
     public function getBotAPI(): string
     {
-        $type = $this->getType()->value;
-        if ($this->hasFileReference()) {
+        $type = $this->type->value;
+        if ($this->fileReference !== null) {
             $type |= FILE_REFERENCE_FLAG;
         }
-        if ($this->hasUrl()) {
+        if ($this->url !== null) {
             $type |= WEB_LOCATION_FLAG;
         }
 
-        $fileId = \pack('VV', $type, $this->getDcId());
-        if ($this->hasFileReference()) {
-            $fileId .= packTLString($this->getFileReference());
+        $fileId = \pack('VV', $type, $this->dcId);
+        if ($this->fileReference !== null) {
+            $fileId .= packTLString($this->fileReference);
         }
-        if ($this->hasUrl()) {
-            $fileId .= packTLString($this->getUrl());
-            $fileId .= packLong($this->getAccessHash());
+        if ($this->url !== null) {
+            $fileId .= packTLString($this->url);
+            $fileId .= packLong($this->accessHash);
             return base64urlEncode(rleEncode($fileId));
         }
 
-        $fileId .= packLong($this->getId());
-        $fileId .= packLong($this->getAccessHash());
+        \assert($this->id !== null);
+        $fileId .= packLong($this->id);
+        $fileId .= packLong($this->accessHash);
 
-        if ($this->getType()->value <= FileIdType::PHOTO->value) {
-            $photoSize = $this->getPhotoSizeSource();
-            $fileId .= \pack('V', $photoSize->getType());
-            switch ($photoSize->getType()) {
-                case PhotoSizeSourceType::LEGACY:
-                    assert($photoSize instanceof PhotoSizeSourceLegacy);
-                    $fileId .= packLong($photoSize->getSecret());
+        if ($this->photoSizeSource !== null) {
+            $photoSize = $this->photoSizeSource;
+            $writeExtra = false;
+            switch (true) {
+                case $photoSize instanceof PhotoSizeSourceLegacy:
+                    if ($this->volumeId === null) {
+                        $writeExtra = true;
+                        $fileId .= \pack('V', PhotoSizeSourceType::LEGACY->value);
+                        $fileId .= packLong($photoSize->secret);
+                    } else {
+                        $fileId .= \pack('V', PhotoSizeSourceType::FULL_LEGACY->value);
+                        $fileId .= packLong($this->volumeId);
+                        $fileId .= packLong($photoSize->secret);
+                        $fileId .= \pack('l', $this->localId);
+                    }
                     break;
-                case PhotoSizeSourceType::FULL_LEGACY:
-                    assert($photoSize instanceof PhotoSizeSourceLegacy);
-                    $fileId .= packLong($this->getVolumeId());
-                    $fileId .= packLong($photoSize->getSecret());
-                    $fileId .= \pack('l', $this->getLocalId());
+                case $photoSize instanceof PhotoSizeSourceThumbnail:
+                    $fileId .= \pack('V', PhotoSizeSourceType::THUMBNAIL->value);
+                    $fileId .= \pack('Va4', $photoSize->thumbFileType->value, $photoSize->thumbType);
                     break;
-                case PhotoSizeSourceType::THUMBNAIL:
-                    assert($photoSize instanceof PhotoSizeSourceThumbnail);
-                    $fileId .= \pack('Va4', $photoSize->getThumbFileType(), $photoSize->getThumbType());
+                case $photoSize instanceof PhotoSizeSourceDialogPhoto:
+                    $fileId .= \pack(
+                        'V',
+                        ($writeExtra = $this->volumeId !== null) ?
+                        (
+                            $photoSize->isSmallDialogPhoto()
+                            ? PhotoSizeSourceType::DIALOGPHOTO_SMALL_LEGACY->value
+                            : PhotoSizeSourceType::DIALOGPHOTO_BIG_LEGACY->value
+                        ) : (
+                            $photoSize->isSmallDialogPhoto()
+                            ? PhotoSizeSourceType::DIALOGPHOTO_SMALL->value
+                            : PhotoSizeSourceType::DIALOGPHOTO_BIG->value
+                        )
+                    );
+                    $fileId .= packLong($photoSize->dialogId);
+                    $fileId .= packLong($photoSize->dialogAccessHash);
                     break;
-                case PhotoSizeSourceType::DIALOGPHOTO_BIG:
-                case PhotoSizeSourceType::DIALOGPHOTO_SMALL:
-                case PhotoSizeSourceType::DIALOGPHOTO_BIG_LEGACY:
-                case PhotoSizeSourceType::DIALOGPHOTO_SMALL_LEGACY:
-                    assert($photoSize instanceof PhotoSizeSourceDialogPhoto);
-                    $fileId .= packLongBig($photoSize->getDialogId());
-                    $fileId .= packLong($photoSize->getDialogAccessHash());
+                case $photoSize instanceof PhotoSizeSourceStickersetThumbnail:
+                    $writeExtra = $this->volumeId !== null;
+                    $fileId .= packLong($photoSize->stickerSetId);
+                    $fileId .= packLong($photoSize->stickerSetAccessHash);
                     break;
-                case PhotoSizeSourceType::STICKERSET_THUMBNAIL:
-                case PhotoSizeSourceType::STICKERSET_THUMBNAIL_LEGACY:
-                    assert($photoSize instanceof PhotoSizeSourceStickersetThumbnail);
-                    $fileId .= packLong($photoSize->getStickerSetId());
-                    $fileId .= packLong($photoSize->getStickerSetAccessHash());
-                    break;
-                case PhotoSizeSourceType::STICKERSET_THUMBNAIL_VERSION:
-                    assert($photoSize instanceof PhotoSizeSourceStickersetThumbnailVersion);
-                    $fileId .= packLong($photoSize->getStickerSetId());
-                    $fileId .= packLong($photoSize->getStickerSetAccessHash());
-                    $fileId .= \pack('l', $photoSize->getStickerSetVersion());
+                case $photoSize instanceof PhotoSizeSourceStickersetThumbnailVersion:
+                    $fileId .= packLong($photoSize->stickerSetId);
+                    $fileId .= packLong($photoSize->stickerSetAccessHash);
+                    $fileId .= \pack('l', $photoSize->stickerSetVersion);
                     break;
             }
-            if ($photoSize->getType() >= PhotoSizeSourceType::DIALOGPHOTO_SMALL_LEGACY && $photoSize->getType()->value <= PhotoSizeSourceType::STICKERSET_THUMBNAIL_LEGACY->value) {
-                $fileId .= packLong($this->getVolumeId());
-                $fileId .= \pack('l', $this->getLocalId());
+            if ($writeExtra && $this->volumeId !== null && $this->localId !== null) {
+                $fileId .= packLong($this->volumeId);
+                $fileId .= \pack('l', $this->localId);
             }
         }
 
-        if ($this->getVersion() >= 4) {
-            $fileId .= \chr($this->getSubVersion());
+        if ($this->version >= 4) {
+            $fileId .= \chr($this->subVersion);
         }
-        $fileId .= \chr($this->getVersion());
+        $fileId .= \chr($this->version);
 
         return base64urlEncode(rleEncode($fileId));
     }
@@ -273,307 +358,5 @@ final class FileId
     public function __toString(): string
     {
         return $this->getBotAPI();
-    }
-    /**
-     * Get bot API file ID version.
-     *
-     */
-    public function getVersion(): int
-    {
-        return $this->version;
-    }
-
-    /**
-     * Set bot API file ID version.
-     *
-     * @param int $version Bot API file ID version.
-     *
-     */
-    public function setVersion(int $version): self
-    {
-        $this->version = $version;
-
-        return $this;
-    }
-
-    /**
-     * Get bot API file ID subversion.
-     *
-     */
-    public function getSubVersion(): int
-    {
-        return $this->subVersion;
-    }
-
-    /**
-     * Set bot API file ID subversion.
-     *
-     * @param int $subVersion Bot API file ID subversion.
-     *
-     */
-    public function setSubVersion(int $subVersion): self
-    {
-        $this->subVersion = $subVersion;
-
-        return $this;
-    }
-
-    /**
-     * Get file type.
-     *
-     */
-    public function getType(): FileIdType
-    {
-        return $this->type;
-    }
-
-    /**
-     * Set file type.
-     *
-     * @param FileIdType $type File type.
-     *
-     */
-    public function setType(FileIdType $type): self
-    {
-        $this->type = $type;
-
-        return $this;
-    }
-
-    /**
-     * Get file reference.
-     *
-     */
-    public function getFileReference(): string
-    {
-        return $this->fileReference;
-    }
-
-    /**
-     * Set file reference.
-     *
-     * @param string $fileReference File reference.
-     *
-     */
-    public function setFileReference(string $fileReference): self
-    {
-        $this->fileReference = $fileReference;
-
-        return $this;
-    }
-
-    /**
-     * Check if has file reference.
-     *
-     * @return boolean
-     */
-    public function hasFileReference(): bool
-    {
-        return !empty($this->fileReference);
-    }
-
-    /**
-     * Get file URL for weblocation.
-     *
-     */
-    public function getUrl(): string
-    {
-        return $this->url;
-    }
-
-    /**
-     * Check if has file URL.
-     *
-     * @return boolean
-     */
-    public function hasUrl(): bool
-    {
-        return !empty($this->url);
-    }
-
-    /**
-     * Set file URL for weblocation.
-     *
-     * @param string $url File URL for weblocation.
-     *
-     */
-    public function setUrl(string $url): self
-    {
-        $this->url = $url;
-
-        return $this;
-    }
-
-    /**
-     * Get file id.
-     *
-     * @return int
-     */
-    public function getId()
-    {
-        return $this->id;
-    }
-
-    /**
-     * Set file id.
-     *
-     * @param int $id File id.
-     *
-     */
-    public function setId(int $id): self
-    {
-        $this->id = $id;
-
-        return $this;
-    }
-
-    /**
-     * Check if has file id.
-     *
-     */
-    public function hasId(): bool
-    {
-        return isset($this->id);
-    }
-
-    /**
-     * Get file access hash.
-     *
-     * @return int
-     */
-    public function getAccessHash()
-    {
-        return $this->accessHash;
-    }
-
-    /**
-     * Set file access hash.
-     *
-     * @param int $accessHash File access hash.
-     *
-     */
-    public function setAccessHash(int $accessHash): self
-    {
-        $this->accessHash = $accessHash;
-
-        return $this;
-    }
-
-    /**
-     * Get photo volume ID.
-     *
-     * @return int
-     */
-    public function getVolumeId()
-    {
-        return $this->volumeId;
-    }
-
-    /**
-     * Set photo volume ID.
-     *
-     * @param int $volumeId Photo volume ID.
-     *
-     */
-    public function setVolumeId(int $volumeId): self
-    {
-        $this->volumeId = $volumeId;
-
-        return $this;
-    }
-    /**
-     * Check if has volume ID.
-     *
-     * @return boolean
-     */
-    public function hasVolumeId(): bool
-    {
-        return isset($this->volumeId);
-    }
-
-    /**
-     * Get photo local ID.
-     *
-     */
-    public function getLocalId(): int
-    {
-        return $this->localId;
-    }
-
-    /**
-     * Set photo local ID.
-     *
-     * @param int $localId Photo local ID.
-     *
-     */
-    public function setLocalId(int $localId): self
-    {
-        $this->localId = $localId;
-
-        return $this;
-    }
-
-    /**
-     * Check if has local ID.
-     *
-     * @return boolean
-     */
-    public function hasLocalId(): bool
-    {
-        return isset($this->localId);
-    }
-
-    /**
-     * Get photo size source.
-     *
-     */
-    public function getPhotoSizeSource(): PhotoSizeSource
-    {
-        return $this->photoSizeSource;
-    }
-
-    /**
-     * Set photo size source.
-     *
-     * @param PhotoSizeSource $photoSizeSource Photo size source.
-     *
-     */
-    public function setPhotoSizeSource(PhotoSizeSource $photoSizeSource): self
-    {
-        $this->photoSizeSource = $photoSizeSource;
-
-        return $this;
-    }
-
-    /**
-     * Check if has photo size source.
-     *
-     * @return boolean
-     */
-    public function hasPhotoSizeSource(): bool
-    {
-        return isset($this->photoSizeSource);
-    }
-
-    /**
-     * Get dC ID.
-     *
-     */
-    public function getDcId(): int
-    {
-        return $this->dcId;
-    }
-
-    /**
-     * Set dC ID.
-     *
-     * @param int $dcId DC ID.
-     *
-     */
-    public function setDcId(int $dcId): self
-    {
-        $this->dcId = $dcId;
-
-        return $this;
     }
 }

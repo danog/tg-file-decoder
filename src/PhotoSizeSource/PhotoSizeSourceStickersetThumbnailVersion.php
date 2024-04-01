@@ -24,92 +24,26 @@ use danog\Decoder\PhotoSizeSource;
  * Represents source of photosize.
  *
  * @api
- *
- * @extends PhotoSizeSource<PhotoSizeSourceStickersetThumbnailVersion>
  */
 final class PhotoSizeSourceStickersetThumbnailVersion extends PhotoSizeSource
 {
-    /**
-     * Stickerset ID.
-     *
-     */
-    private int $stickerSetId;
-    /**
-     * Stickerset access hash.
-     *
-     */
-    private int $stickerSetAccessHash;
-    /**
-     * Stickerset version.
-     *
-     */
-    private int $stickerSetVersion;
+    public function __construct(
+        /**
+         * Stickerset ID.
+         *
+         */
+        public readonly int $stickerSetId,
+        /**
+         * Stickerset access hash.
+         *
+         */
+        public readonly int $stickerSetAccessHash,
+        /**
+         * Stickerset version.
+         *
+         */
+        public readonly int $stickerSetVersion
+    ) {
 
-    /**
-     * Get stickerset ID.
-     *
-     * @return int
-     */
-    public function getStickerSetId()
-    {
-        return $this->stickerSetId;
-    }
-
-    /**
-     * Set stickerset ID.
-     *
-     * @param int $stickerSetId Stickerset ID
-     *
-     */
-    public function setStickerSetId(int $stickerSetId): self
-    {
-        $this->stickerSetId = $stickerSetId;
-
-        return $this;
-    }
-
-    /**
-     * Get stickerset access hash.
-     *
-     * @return int
-     */
-    public function getStickerSetAccessHash()
-    {
-        return $this->stickerSetAccessHash;
-    }
-
-    /**
-     * Set stickerset access hash.
-     *
-     * @param int $stickerSetAccessHash Stickerset access hash
-     *
-     */
-    public function setStickerSetAccessHash(int $stickerSetAccessHash): self
-    {
-        $this->stickerSetAccessHash = $stickerSetAccessHash;
-
-        return $this;
-    }
-
-    /**
-     * Get stickerset version.
-     *
-     */
-    public function getStickerSetVersion(): int
-    {
-        return $this->stickerSetVersion;
-    }
-
-    /**
-     * Set stickerset version.
-     *
-     * @param int $stickerSetVersion Stickerset version.
-     *
-     */
-    public function setStickerSetVersion(int $stickerSetVersion): self
-    {
-        $this->stickerSetVersion = $stickerSetVersion;
-
-        return $this;
     }
 }

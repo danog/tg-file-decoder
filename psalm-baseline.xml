@@ -1,8 +1,0 @@
-<?xml version="1.0" encoding="UTF-8"?>
-<files psalm-version="dev-master@ef3b018e89c4ffc157332c13e2ebf9cf22320d17">
-  <file src="src/functions.php">
-    <UnusedVariable>
-      <code><![CDATA[$BIG_ENDIAN]]></code>
-    </UnusedVariable>
-  </file>
-</files>

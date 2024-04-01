@@ -30,50 +30,50 @@ use danog\Decoder\PhotoSizeSource\PhotoSizeSourceThumbnail;
 final class UniqueFileId
 {
     /**
-     * File type.
-     *
-     */
-    private UniqueFileIdType $type;
-    /**
-     * File ID.
-     *
-     */
-    private int $id;
-    /**
-     * Photo volume ID.
-     *
-     */
-    private int $volumeId;
-    /**
-     * Photo local ID.
-     *
-     */
-    private int $localId;
-    /**
-     * Photo subtype.
-     *
-     */
-    private int $subType;
-    /**
-     * Sticker set ID.
-     *
-     */
-    private int $stickerSetId;
-    /**
-     * Sticker set version.
-     *
-     */
-    private int $stickerSetVersion;
-    /**
-     * Weblocation URL.
-     *
-     */
-    private string $url;
-    /**
      * Basic constructor function.
      */
-    public function __construct()
-    {
+    public function __construct(
+        /**
+         * File type.
+         *
+         */
+        public readonly UniqueFileIdType $type,
+        /**
+         * File ID.
+         *
+         */
+        public readonly ?int $id = null,
+        /**
+         * Photo subtype.
+         *
+         */
+        public readonly ?int $subType = null,
+        /**
+         * Photo volume ID.
+         *
+         */
+        public readonly ?int $volumeId = null,
+        /**
+         * Photo local ID.
+         *
+         */
+        public readonly ?int $localId = null,
+        /**
+         * Sticker set ID.
+         *
+         */
+        public readonly ?int $stickerSetId = null,
+        /**
+         * Sticker set version.
+         *
+         */
+        public readonly ?int $stickerSetVersion = null,
+        /**
+         * Weblocation URL.
+         *
+         */
+        public readonly ?string $url= null,
+    ) {
     }
 
     /**
@@ -91,23 +91,25 @@ final class UniqueFileId
      */
     public function getUniqueBotAPI(): string
     {
-        $fileId = \pack('V', $this->getType());
-        if ($this->getType() === UniqueFileIdType::WEB) {
-            $fileId .= packTLString($this->getUrl());
-        } elseif ($this->getType() === UniqueFileIdType::PHOTO) {
-            if ($this->hasVolumeId()) {
-                $fileId .= packLong($this->getVolumeId());
-                $fileId .= \pack('l', $this->getLocalId());
-            } elseif ($this->hasStickerSetId()) {
-                $fileId .= \chr($this->getSubType());
-                $fileId .= packLong($this->getStickerSetId());
-                $fileId .= \pack('l', $this->getStickerSetVersion());
+        $fileId = \pack('V', $this->type->value);
+        if ($this->url !== null) {
+            $fileId .= packTLString($this->url);
+        } elseif ($this->type === UniqueFileIdType::PHOTO) {
+            if ($this->volumeId !== null) {
+                $fileId .= packLong($this->volumeId);
+                $fileId .= \pack('l', $this->localId);
+            } elseif ($this->stickerSetId !== null) {
+                \assert($this->subType !== null);
+                $fileId .= \chr($this->subType);
+                $fileId .= packLong($this->stickerSetId);
+                $fileId .= \pack('l', $this->stickerSetVersion);
             } else {
-                $fileId .= packLong($this->getId());
-                $fileId .= \chr($this->getSubType());
+                \assert($this->subType !== null && $this->id !== null);
+                $fileId .= packLong($this->id);
+                $fileId .= \chr($this->subType);
             }
-        } elseif ($this->hasId()) {
-            $fileId .= packLong($this->getId());
+        } elseif ($this->id !== null) {
+            $fileId .= packLong($this->id);
         }
 
         return base64urlEncode(rleEncode($fileId));
@@ -121,28 +123,61 @@ final class UniqueFileId
      */
     public static function fromUniqueBotAPI(string $fileId): self
     {
-        $result = new self();
-        $resultArray = internalDecodeUnique($fileId);
-        $result->setType($resultArray['typeId']);
-        if ($result->getType() === UniqueFileIdType::WEB) {
-            $result->setUrl($resultArray['url']);
-        } elseif ($result->getType() === UniqueFileIdType::PHOTO) {
-            if (isset($resultArray['volume_id'])) {
-                $result->setVolumeId($resultArray['volume_id']);
-                $result->setLocalId($resultArray['local_id']);
-            } elseif (isset($resultArray['id'])) {
-                $result->setId($resultArray['id']);
-                $result->setSubType($resultArray['subType']);
-            } elseif (isset($resultArray['sticker_set_id'])) {
-                $result->setStickerSetId($resultArray['sticker_set_id']);
-                $result->setStickerSetVersion($resultArray['sticker_set_version']);
-                $result->setSubType($resultArray['subType']);
-            }
-        } elseif (isset($resultArray['id'])) {
-            $result->setId($resultArray['id']);
-        }
+        $orig = $fileId;
+        $fileId = rleDecode(base64urlDecode($fileId));
 
-        return $result;
+        /** @var int */
+        $typeId = \unpack('V', $fileId)[1];
+        $type = UniqueFileIdType::from($typeId);
+        $url = null;
+
+        $subType = null;
+        $id = null;
+        $fileId = \substr($fileId, 4);
+        $volume_id = null;
+        $local_id = null;
+        $sticker_set_id = null;
+        $sticker_set_version = null;
+        if ($type === UniqueFileIdType::WEB) {
+            $res = \fopen('php://memory', 'rw+b');
+            \assert($res !== false);
+            \fwrite($res, $fileId);
+            \fseek($res, 0);
+            $fileId = $res;
+            $url = readTLString($fileId);
+
+            $l = \fstat($fileId)['size'] - \ftell($fileId);
+            \trigger_error("Unique file ID $orig has $l bytes of leftover data");
+        } elseif (\strlen($fileId) === 12) {
+            // Legacy photos
+            $volume_id = unpackLong(\substr($fileId, 0, 8));
+            $local_id = unpackInt(\substr($fileId, 8));
+        } elseif (\strlen($fileId) === 9) {
+            // Dialog photos/thumbnails
+            $id = unpackLong($fileId);
+            $subType = \ord($fileId[8]);
+        } elseif (\strlen($fileId) === 13) {
+            // Stickerset ID/version
+            $subType = \ord($fileId[0]);
+            $sticker_set_id = unpackLong(\substr($fileId, 1, 8));
+            $sticker_set_version = unpackInt(\substr($fileId, 9));
+        } elseif (\strlen($fileId) === 8) {
+            // Any other document
+            $id = unpackLong($fileId);
+        } else {
+            $l = \strlen($fileId);
+            \trigger_error("Unique file ID $orig has $l bytes of leftover data");
+        }
+        return new self(
+            type: $type,
+            id: $id,
+            subType: $subType,
+            volumeId: $volume_id,
+            localId: $local_id,
+            stickerSetId: $sticker_set_id,
+            stickerSetVersion: $sticker_set_version,
+            url: $url
+        );
     }
 
     /**
@@ -164,287 +199,45 @@ final class UniqueFileId
      */
     public static function fromFileId(FileId $fileId): self
     {
-        $result = new self();
-        $result->setType($fileId->getType()->toUnique());
-        if ($result->hasUrl()) {
-            $result->setType(UniqueFileIdType::WEB);
+        if ($fileId->url !== null) {
+            return new self(
+                UniqueFileIdType::WEB,
+                url: $fileId->url
+            );
         }
-        if ($result->getType() === UniqueFileIdType::WEB) {
-            $result->setUrl($fileId->getUrl());
-        } elseif ($result->getType() === UniqueFileIdType::PHOTO) {
-            if ($fileId->hasVolumeId()) {
-                $result->setVolumeId($fileId->getVolumeId());
-                $result->setLocalId($fileId->getLocalId());
-            } elseif ($fileId->hasId()) {
-                $result->setId($fileId->getId());
-                $photoSize = $fileId->getPhotoSizeSource();
-                if ($photoSize instanceof PhotoSizeSourceThumbnail) {
-                    $type = $photoSize->getThumbType();
-                    if ($type === 'a') {
-                        $type = \chr(0);
-                    } elseif ($type === 'c') {
-                        $type = \chr(1);
-                    } else {
-                        $type = \chr(\ord($type)+5);
-                    }
-                    $result->setSubType(\ord($type));
-                } elseif ($photoSize instanceof PhotoSizeSourceDialogPhoto) {
-                    $result->setSubType($photoSize->isSmallDialogPhoto() ? 0 : 1);
-                } elseif ($photoSize instanceof PhotoSizeSourceStickersetThumbnailVersion) {
-                    $result->setSubType(2);
-                    $result->setStickerSetId($photoSize->getStickerSetId());
-                    $result->setStickerSetVersion($photoSize->getStickerSetVersion());
+        $type = $fileId->type->toUnique();
+        if ($type === UniqueFileIdType::PHOTO) {
+            $photoSize = $fileId->photoSizeSource;
+            $subType = null;
+            if ($photoSize instanceof PhotoSizeSourceThumbnail) {
+                $subType = \ord($photoSize->thumbType);
+                if ($subType === 97) {
+                    $subType = 0;
+                } elseif ($subType === 99) {
+                    $subType = 1;
+                } else {
+                    $subType = $subType+5;
                 }
+                $subType = $subType;
+            } elseif ($photoSize instanceof PhotoSizeSourceDialogPhoto) {
+                $subType = $photoSize->isSmallDialogPhoto() ? 0 : 1;
+            } elseif ($photoSize instanceof PhotoSizeSourceStickersetThumbnailVersion) {
+                return new self(
+                    $type,
+                    $fileId->id,
+                    2,
+                    stickerSetId: $photoSize->stickerSetId,
+                    stickerSetVersion: $photoSize->stickerSetVersion,
+                );
             }
-        } elseif ($fileId->hasId()) {
-            $result->setId($fileId->getId());
+            return new self(
+                $type,
+                $fileId->id,
+                $subType,
+                $fileId->volumeId,
+                $fileId->localId,
+            );
         }
-
-        return $result;
-    }
-
-    /**
-     * Get unique file type.
-     *
-     */
-    public function getType(): UniqueFileIdType
-    {
-        return $this->type;
-    }
-
-    /**
-     * Set file type.
-     *
-     * @param UniqueFileIdType $type File type.
-     *
-     */
-    public function setType(UniqueFileIdType $type): self
-    {
-        $this->type = $type;
-
-        return $this;
-    }
-
-    /**
-     * Get file ID.
-     *
-     * @return int
-     */
-    public function getId()
-    {
-        return $this->id;
-    }
-
-    /**
-     * Set file ID.
-     *
-     * @param int $id File ID.
-     *
-     */
-    public function setId(int $id): self
-    {
-        $this->id = $id;
-
-        return $this;
-    }
-
-    /**
-     * Check if has ID.
-     *
-     * @return boolean
-     */
-    public function hasId(): bool
-    {
-        return isset($this->id);
-    }
-
-    /**
-     * Get photo volume ID.
-     *
-     * @return int
-     */
-    public function getVolumeId()
-    {
-        return $this->volumeId;
-    }
-
-    /**
-     * Set photo volume ID.
-     *
-     * @param int $volumeId Photo volume ID.
-     *
-     */
-    public function setVolumeId(int $volumeId): self
-    {
-        $this->volumeId = $volumeId;
-
-        return $this;
-    }
-    /**
-     * Check if has volume ID.
-     *
-     * @return boolean
-     */
-    public function hasVolumeId(): bool
-    {
-        return isset($this->volumeId);
-    }
-
-    /**
-     * Get photo local ID.
-     *
-     */
-    public function getLocalId(): int
-    {
-        return $this->localId;
-    }
-
-    /**
-     * Set photo local ID.
-     *
-     * @param int $localId Photo local ID.
-     *
-     */
-    public function setLocalId(int $localId): self
-    {
-        $this->localId = $localId;
-
-        return $this;
-    }
-
-    /**
-     * Check if has local ID.
-     *
-     * @return boolean
-     */
-    public function hasLocalId(): bool
-    {
-        return isset($this->localId);
-    }
-
-    /**
-     * Get weblocation URL.
-     *
-     */
-    public function getUrl(): string
-    {
-        return $this->url;
-    }
-
-    /**
-     * Set weblocation URL.
-     *
-     * @param string $url Weblocation URL
-     *
-     */
-    public function setUrl(string $url): self
-    {
-        $this->url = $url;
-
-        return $this;
-    }
-
-    /**
-     * Check if has weblocation URL.
-     *
-     * @return boolean
-     */
-    public function hasUrl(): bool
-    {
-        return isset($this->url);
-    }
-
-    /**
-     * Get photo subtype.
-     *
-     */
-    public function getSubType(): int
-    {
-        return $this->subType;
-    }
-
-    /**
-     * Has photo subtype?
-     *
-     */
-    public function hasSubType(): bool
-    {
-        return isset($this->subType);
-    }
-
-    /**
-     * Set photo subtype.
-     *
-     * @param int $subType Photo subtype
-     *
-     */
-    public function setSubType(int $subType): self
-    {
-        $this->subType = $subType;
-
-        return $this;
-    }
-
-    /**
-     * Get sticker set ID.
-     *
-     * @return int
-     */
-    public function getStickerSetId()
-    {
-        return $this->stickerSetId;
-    }
-
-    /**
-     * Has sticker set ID?
-     *
-     */
-    public function hasStickerSetId(): bool
-    {
-        return isset($this->stickerSetId);
-    }
-
-    /**
-     * Set sticker set ID.
-     *
-     * @param int $stickerSetId Sticker set ID
-     *
-     */
-    public function setStickerSetId(int $stickerSetId): self
-    {
-        $this->stickerSetId = $stickerSetId;
-
-        return $this;
-    }
-
-    /**
-     * Get sticker set version.
-     *
-     */
-    public function getStickerSetVersion(): int
-    {
-        return $this->stickerSetVersion;
-    }
-
-    /**
-     * Has sticker set version.
-     *
-     */
-    public function hasStickerSetVersion(): bool
-    {
-        return isset($this->stickerSetVersion);
-    }
-
-    /**
-     * Set sticker set version.
-     *
-     * @param int $stickerSetVersion Sticker set version
-     *
-     */
-    public function setStickerSetVersion(int $stickerSetVersion): self
-    {
-        $this->stickerSetVersion = $stickerSetVersion;
-
-        return $this;
+        return new self($type, $fileId->id);
     }
 }

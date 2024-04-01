@@ -19,6 +19,9 @@
 
 namespace danog\Decoder;
 
+/**
+ * @internal Not for public use
+ */
 enum PhotoSizeSourceType: int
 {
     case LEGACY = 0;

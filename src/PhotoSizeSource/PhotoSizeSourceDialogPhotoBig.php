@@ -18,27 +18,19 @@
 
 namespace danog\Decoder\PhotoSizeSource;
 
-use danog\Decoder\FileIdType;
-use danog\Decoder\PhotoSizeSource;
-
 /**
  * Represents source of photosize.
  *
  * @api
  */
-final class PhotoSizeSourceThumbnail extends PhotoSizeSource
+final class PhotoSizeSourceDialogPhotoBig extends PhotoSizeSourceDialogPhoto
 {
-    public function __construct(
-        /**
-         * File type of original file.
-         *
-         */
-        public readonly FileIdType $thumbFileType,
-        /**
-         * Thumbnail size.
-         *
-         */
-        public readonly string $thumbType,
-    ) {
+    /**
+     * Get whether the big or small version of the photo is being used.
+     *
+     */
+    public function isSmallDialogPhoto(): bool
+    {
+        return false;
     }
 }
