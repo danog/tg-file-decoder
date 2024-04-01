@@ -120,50 +120,18 @@ $encoded = (string) $fileId; // CAACAgQAAxkDAAJEsl44nl3yxPZ8biI8uhaA7rbQceOSAAKt
 
 ### Bot API file ID types
 
-The file type is a numeric constant indicating the type of file, (the constant is always in the `danog\Decoder` namespace).
-The file type name is a string version of the file type, typically the one used in bot API file objects.  
+The file type is a PHP enum indicating the type of file, [danog\Decoder\FileIdType](https://github.com/danog/tg-file-decoder/blob/master/docs/danog/Decoder/FileIdType.md).  
 
-The `TYPES` array contains a `file type` => `file type name` map.
-The `TYPES_IDS` array contains a `file type name` => `file type` map.
+Click [here &raquo;](https://github.com/danog/tg-file-decoder/blob/master/docs/danog/Decoder/FileIdType.md) to view the full list of file ID types.  
 
-`const CONSTANTNAME = value` - Description (`type name`)
-
-* `const THUMBNAIL = 0` - Thumbnail (`thumbnail`)
-* `const PROFILE_PHOTO = 1` - Profile photo; used for users, supergroups and channels, chat photos are normal PHOTOs (`profile_photo`)
-* `const PHOTO = 2` - Photo (`photo`)
-* `const VOICE = 3` - Voice message (`voice`)
-* `const VIDEO = 4` - Video (`video`)
-* `const DOCUMENT = 5` - Document (`document`)
-* `const ENCRYPTED = 6` - Secret chat document (`encrypted`)
-* `const TEMP = 7` - Temp document (`temp`)
-* `const STICKER = 8` - Sticker (`sticker`)
-* `const AUDIO = 9` - Music (`audio`)
-* `const ANIMATION = 10` - GIF (`animation`)
-* `const ENCRYPTED_THUMBNAIL = 11` - Thumbnail of secret chat document (`encrypted_thumbnail`)
-* `const WALLPAPER = 12` - Wallpaper (`wallpaper`)
-* `const VIDEO_NOTE = 13` - Round video (`video_note`)
-* `const SECURE_RAW = 14` - Passport raw file (`secure_raw`)
-* `const SECURE = 15` - Passport file (`secure`)
-* `const WALLPAPER = 16` - Background (`background`)
-* `const WALLPAPER = 17` - Size (`size`)
-* `const NONE = 18` - 
+The enum also offers a `FileIdType::from` method that can be used to obtain the correct case, from a string version of the file type, typically the one used in bot API file objects.  
 
 ### Bot API unique file ID types
 
-The unique file type is a numeric constant indicating the type of the unique file ID, (the constant is always in the `danog\Decoder` namespace).
-The unique file type name is a string version of the unique file type, typically the one used in bot API file objects.  
+The unique file type is a PHP enum uniquely indicating the unique file, [danog\Decoder\UniqueFileIdType](https://github.com/danog/tg-file-decoder/blob/master/docs/danog/Decoder/UniqueFileIdType.md).  
 
+Click [here &raquo;](https://github.com/danog/tg-file-decoder/blob/master/docs/danog/Decoder/UniqueFileIdType.md) to view the full list of file ID types.  
 
-The `UNIQUE_TYPES` array contains a `unique file type` => `unique file type name` map.
-The `UNIQUE_TYPES_IDS` array contains a `unique file type name` => `unique file type` map.
-The `FULL_UNIQUE_MAP` array contains a `full file type` => `unique file type` map.
-
-* `const UNIQUE_WEB = 0` - Used for web files (all file types that have a URL (`hasUrl`))
-* `const UNIQUE_PHOTO = 1` - Used for photos and similar (`getType() <= PHOTO`)
-* `const UNIQUE_DOCUMENT = 2` - Used for all other types of files (documents, audio, video, voice, sticker, animation, video note)
-* `const UNIQUE_SECURE = 3` - Used for passport files
-* `const UNIQUE_ENCRYPTED = 4` - Used for secret chat files
-* `const UNIQUE_TEMP = 5` - Used for temp files
 
 ## Full API documentation
 

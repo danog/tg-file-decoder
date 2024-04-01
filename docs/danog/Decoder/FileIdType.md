@@ -55,34 +55,15 @@ Represents decoded bot API file ID type.
 
 ## Properties
 * `$name`: `string` 
-* `$value`: `int` 
+* `$value`: `string` 
 
 ## Method list:
-* [`fromBotApiType(string $type): self`](#frombotapitype-string-type-self)
-* [`toBotApiType(): string`](#tobotapitype-string)
 * [`toUnique(): \danog\Decoder\UniqueFileIdType`](#tounique-danog-decoder-uniquefileidtype)
 * [`cases(): array`](#cases-array)
 * [`from(string|int $value): static`](#from-string-int-value-static)
 * [`tryFrom(string|int $value): ?static`](#tryfrom-string-int-value-static)
 
 ## Methods:
-### `fromBotApiType(string $type): self`
-
-Obtain a FileId enum variant from a bot API type name.
-
-
-Parameters:
-
-* `$type`: `string`   
-
-
-
-### `toBotApiType(): string`
-
-Obtain a bot API type name.
-
-
-
 ### `toUnique(): \danog\Decoder\UniqueFileIdType`
 
 Convert file ID type to unique file ID type.

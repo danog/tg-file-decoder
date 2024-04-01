@@ -138,7 +138,7 @@ final class FileId
             $access_hash = Tools::unpackLong($read(8));
             return new self(
                 $dc_id,
-                FileIdType::from($typeId),
+                FileIdType::fromInnerId($typeId),
                 null,
                 $access_hash,
                 fileReference: $fileReference,
@@ -153,7 +153,7 @@ final class FileId
         $volume_id = null;
         $local_id = null;
         $photoSizeSource = null;
-        if ($typeId <= FileIdType::PHOTO->value) {
+        if ($typeId <= FileIdType::PHOTO->toInnerID()) {
             if ($subVersion < 32) {
                 $volume_id = Tools::unpackLong($read(8));
                 $local_id = Tools::unpackInt($read(4));
@@ -174,7 +174,7 @@ final class FileId
                     /** @var array{file_type: int, thumbnail_type: string} */
                     $result = \unpack('Vfile_type/athumbnail_type', $read(8));
                     $photoSizeSource = new PhotoSizeSourceThumbnail(
-                        FileIdType::from($result['file_type']),
+                        FileIdType::fromInnerId($result['file_type']),
                         $result['thumbnail_type']
                     );
                     break;
@@ -233,7 +233,7 @@ final class FileId
 
         return new self(
             dcId: $dc_id,
-            type: FileIdType::from($typeId),
+            type: FileIdType::fromInnerId($typeId),
             id: $id,
             accessHash: $access_hash,
             volumeId: $volume_id,
@@ -251,7 +251,7 @@ final class FileId
      */
     public function getBotAPI(): string
     {
-        $type = $this->type->value;
+        $type = $this->type->toInnerID();
         if ($this->fileReference !== null) {
             $type |= Tools::FILE_REFERENCE_FLAG;
         }

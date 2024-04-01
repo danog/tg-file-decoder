@@ -9,7 +9,10 @@ use danog\Decoder\UniqueFileId;
 use PHPUnit\Framework\Attributes\DataProvider;
 use PHPUnit\Framework\TestCase;
 
-/** @internal */
+/**
+ * @api
+ * @internal
+ */
 class IntegrationTest extends TestCase
 {
     #[DataProvider('provideFileIdsAndType')]
@@ -56,7 +59,7 @@ class IntegrationTest extends TestCase
                 $result['small_file_unique_id'],
             ];
             yield [
-                FileIdType::fromBotApiType('profile_photo'),
+                FileIdType::from('profile_photo'),
                 $result['big_file_id'],
                 $result['big_file_unique_id'],
             ];
@@ -85,13 +88,13 @@ class IntegrationTest extends TestCase
             foreach ($botResult as $subResult) {
                 /** @var string $type */
                 yield [
-                    FileIdType::fromBotApiType($type),
+                    FileIdType::from($type),
                     $subResult['file_id'],
                     $subResult['file_unique_id']
                 ];
                 if (isset($subResult['thumb'])) {
                     yield [
-                        FileIdType::fromBotApiType('thumbnail'),
+                        FileIdType::from('thumbnail'),
                         $subResult['thumb']['file_id'],
                         $subResult['thumb']['file_unique_id']
                     ];

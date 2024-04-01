@@ -25,134 +25,139 @@ use AssertionError;
  *
  * @api
  */
-enum FileIdType: int
+enum FileIdType: string
 {
     /**
      * Thumbnail.
      */
-    case THUMBNAIL = 0;
+    case THUMBNAIL = 'thumbnail';
     /**
      * Profile photo.
      * Used for users and channels, chat photos are normal PHOTOs.
      */
-    case PROFILE_PHOTO = 1;
+    case PROFILE_PHOTO = 'profile_photo';
     /**
      * Normal photos.
      */
-    case PHOTO = 2;
+    case PHOTO = 'photo';
 
     /**
      * Voice messages.
      */
-    case VOICE = 3;
+    case VOICE = 'voice';
     /**
      * Video.
      */
-    case VIDEO = 4;
+    case VIDEO = 'video';
     /**
      * Document.
      */
-    case DOCUMENT = 5;
+    case DOCUMENT = 'document';
     /**
      * Secret chat document.
      */
-    case ENCRYPTED = 6;
+    case ENCRYPTED = 'encrypted';
     /**
      * Temporary document.
      */
-    case TEMP = 7;
+    case TEMP = 'temp';
     /**
      * Sticker.
      */
-    case STICKER = 8;
+    case STICKER = 'sticker';
     /**
      * Music.
      */
-    case AUDIO = 9;
+    case AUDIO = 'audio';
     /**
      * GIF.
      */
-    case ANIMATION = 10;
+    case ANIMATION = 'animation';
     /**
      * Encrypted thumbnail.
      */
-    case ENCRYPTED_THUMBNAIL = 11;
+    case ENCRYPTED_THUMBNAIL = 'encrypted_thumbnail';
     /**
      * Wallpaper.
      */
-    case WALLPAPER = 12;
+    case WALLPAPER = 'wallpaper';
     /**
      * Round video.
      */
-    case VIDEO_NOTE = 13;
+    case VIDEO_NOTE = 'video_note';
     /**
      * Passport raw file.
      */
-    case SECURE_RAW = 14;
+    case SECURE_RAW = 'secure_raw';
     /**
      * Passport file.
      */
-    case SECURE = 15;
+    case SECURE = 'secure';
     /**
      * Background.
      */
-    case BACKGROUND = 16;
+    case BACKGROUND = 'background';
     /**
      * Size.
      */
-    case SIZE = 17;
+    case SIZE = 'size';
 
+    /** @internal Should not be used manually. */
     /**
-     * Obtain a FileId enum variant from a bot API type name.
+     * Obtain a bot API type ID.
+     *
+     * @internal Should not be used manually.
      */
-    public static function fromBotApiType(string $type): self
+    public static function fromInnerID(int $id): self
     {
-        return match ($type) {
-            'thumbnail' => self::THUMBNAIL,
-            'profile_photo' => self::PROFILE_PHOTO,
-            'photo' => self::PHOTO,
-            'voice' => self::VOICE,
-            'video' => self::VIDEO,
-            'document' => self::DOCUMENT,
-            'encrypted' => self::ENCRYPTED,
-            'temp' => self::TEMP,
-            'sticker' => self::STICKER,
-            'audio' => self::AUDIO,
-            'animation' => self::ANIMATION,
-            'encrypted_thumbnail' => self::ENCRYPTED_THUMBNAIL,
-            'wallpaper' => self::WALLPAPER,
-            'video_note' => self::VIDEO_NOTE,
-            'secure_raw' => self::SECURE_RAW,
-            'secure' => self::SECURE,
-            'background' => self::BACKGROUND,
-            'size' => self::SIZE,
+        return match ($id) {
+            0 => self::THUMBNAIL,
+            1 => self::PROFILE_PHOTO,
+            2 => self::PHOTO,
+            3 => self::VOICE,
+            4 => self::VIDEO,
+            5 => self::DOCUMENT,
+            6 => self::ENCRYPTED,
+            7 => self::TEMP,
+            8 => self::STICKER,
+            9 => self::AUDIO,
+            10 => self::ANIMATION,
+            11 => self::ENCRYPTED_THUMBNAIL,
+            12 => self::WALLPAPER,
+            13 => self::VIDEO_NOTE,
+            14 => self::SECURE_RAW,
+            15 => self::SECURE,
+            16 => self::BACKGROUND,
+            17 => self::SIZE,
         };
     }
 
     /**
-     * Obtain a bot API type name.
+     * Obtain a bot API type ID.
+     *
+     * @internal Should not be used manually.
      */
-    public function toBotApiType(): string
+    public function toInnerID(): int
     {
         return match ($this) {
-            self::THUMBNAIL => 'thumbnail' ,
-            self::PROFILE_PHOTO => 'profile_photo',
-            self::PHOTO =>'photo' ,
-            self::VOICE=>'voice' ,
-            self::VIDEO =>'video'  ,
-            self::DOCUMENT=> 'document' ,
-            self::ENCRYPTED =>'encrypted' ,
-            self::TEMP =>'temp',
-            self::STICKER =>'sticker',
-            self::AUDIO =>'audio',
-            self::ANIMATION =>'animation',
-            self::ENCRYPTED_THUMBNAIL =>'encrypted_thumbnail',
-            self::WALLPAPER =>'wallpaper',
-            self::VIDEO_NOTE =>'video_note',
-            self::SECURE_RAW =>'secure_raw',
-            self::SECURE =>'secure',
-            self::BACKGROUND=>'background',
-            self::SIZE=>'size',
+            self::THUMBNAIL => 0,
+            self::PROFILE_PHOTO => 1,
+            self::PHOTO => 2,
+            self::VOICE=> 3,
+            self::VIDEO => 4,
+            self::DOCUMENT=> 5,
+            self::ENCRYPTED => 6,
+            self::TEMP => 7,
+            self::STICKER => 8,
+            self::AUDIO => 9,
+            self::ANIMATION => 10,
+            self::ENCRYPTED_THUMBNAIL => 11,
+            self::WALLPAPER => 12,
+            self::VIDEO_NOTE => 13,
+            self::SECURE_RAW => 14,
+            self::SECURE => 15,
+            self::BACKGROUND=> 16,
+            self::SIZE=>17,
         };
     }
 
