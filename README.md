@@ -6,6 +6,8 @@
 
 Decode and encode [Telegram bot API file IDs](https://core.telegram.org)!  
 
+This library was initially created for [MadelineProto](https://docs.madelineproto.xyz), an async PHP client API for the telegram MTProto protocol.
+
 ## Install
 
 ```bash
