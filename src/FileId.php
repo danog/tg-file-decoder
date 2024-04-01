@@ -292,7 +292,7 @@ final class FileId
                     break;
                 case $photoSize instanceof PhotoSizeSourceThumbnail:
                     $fileId .= \pack('V', PhotoSizeSourceType::THUMBNAIL->value);
-                    $fileId .= \pack('Va4', $photoSize->thumbFileType->value, $photoSize->thumbType);
+                    $fileId .= \pack('Va4', $photoSize->thumbFileType->toInnerID(), $photoSize->thumbType);
                     break;
                 case $photoSize instanceof PhotoSizeSourceDialogPhoto:
                     $fileId .= \pack(
