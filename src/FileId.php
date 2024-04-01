@@ -111,7 +111,7 @@ final class FileId
     public static function fromBotAPI(string $fileId): self
     {
         $orig = $fileId;
-        $fileId = rleDecode(base64urlDecode($fileId));
+        $fileId = Tools::rleDecode(Tools::base64urlDecode($fileId));
         $version = \ord($fileId[\strlen($fileId) - 1]);
         $subVersion = $version === 4 ? \ord($fileId[\strlen($fileId) - 2]) : 0;
 
@@ -126,16 +126,16 @@ final class FileId
             return $res;
         };
 
-        $typeId = unpackInt($read(4));
-        $dc_id = unpackInt($read(4));
-        $fileReference = $typeId & FILE_REFERENCE_FLAG ? readTLString($fileId) : null;
-        $hasWebLocation = (bool) ($typeId & WEB_LOCATION_FLAG);
-        $typeId &= ~FILE_REFERENCE_FLAG;
-        $typeId &= ~WEB_LOCATION_FLAG;
+        $typeId = Tools::unpackInt($read(4));
+        $dc_id = Tools::unpackInt($read(4));
+        $fileReference = $typeId & Tools::FILE_REFERENCE_FLAG ? Tools::readTLString($fileId) : null;
+        $hasWebLocation = (bool) ($typeId & Tools::WEB_LOCATION_FLAG);
+        $typeId &= ~Tools::FILE_REFERENCE_FLAG;
+        $typeId &= ~Tools::WEB_LOCATION_FLAG;
 
         if ($hasWebLocation) {
-            $url = readTLString($fileId);
-            $access_hash = unpackLong($read(8));
+            $url = Tools::readTLString($fileId);
+            $access_hash = Tools::unpackLong($read(8));
             return new self(
                 $dc_id,
                 FileIdType::from($typeId),
@@ -147,28 +147,28 @@ final class FileId
                 subVersion: $subVersion
             );
         }
-        $id = unpackLong($read(8));
-        $access_hash = unpackLong($read(8));
+        $id = Tools::unpackLong($read(8));
+        $access_hash = Tools::unpackLong($read(8));
 
         $volume_id = null;
         $local_id = null;
         $photoSizeSource = null;
         if ($typeId <= FileIdType::PHOTO->value) {
             if ($subVersion < 32) {
-                $volume_id = unpackLong($read(8));
-                $local_id = unpackInt($read(4));
+                $volume_id = Tools::unpackLong($read(8));
+                $local_id = Tools::unpackInt($read(4));
             }
 
             /** @psalm-suppress MixedArgument */
             $photosize_source = PhotoSizeSourceType::from($subVersion >= 4 ? \unpack('V', $read(4))[1] : 0);
             switch ($photosize_source) {
                 case PhotoSizeSourceType::LEGACY:
-                    $photoSizeSource = new PhotoSizeSourceLegacy(unpackLong($read(8)));
+                    $photoSizeSource = new PhotoSizeSourceLegacy(Tools::unpackLong($read(8)));
                     break;
                 case PhotoSizeSourceType::FULL_LEGACY:
-                    $volume_id = unpackLong($read(8));
-                    $photoSizeSource = new PhotoSizeSourceLegacy(unpackLong($read(8)));
-                    $local_id = unpackInt($read(4));
+                    $volume_id = Tools::unpackLong($read(8));
+                    $photoSizeSource = new PhotoSizeSourceLegacy(Tools::unpackLong($read(8)));
+                    $local_id = Tools::unpackInt($read(4));
                     break;
                 case PhotoSizeSourceType::THUMBNAIL:
                     /** @var array{file_type: int, thumbnail_type: string} */
@@ -184,14 +184,14 @@ final class FileId
                         ? PhotoSizeSourceDialogPhotoSmall::class
                         : PhotoSizeSourceDialogPhotoBig::class;
                     $photoSizeSource = new $clazz(
-                        unpackLong($read(8)),
-                        unpackLong($read(8)),
+                        Tools::unpackLong($read(8)),
+                        Tools::unpackLong($read(8)),
                     );
                     break;
                 case PhotoSizeSourceType::STICKERSET_THUMBNAIL:
                     $photoSizeSource = new PhotoSizeSourceStickersetThumbnail(
-                        unpackLong($read(8)),
-                        unpackLong($read(8))
+                        Tools::unpackLong($read(8)),
+                        Tools::unpackLong($read(8))
                     );
                     break;
                 case PhotoSizeSourceType::DIALOGPHOTO_BIG_LEGACY:
@@ -200,27 +200,27 @@ final class FileId
                         ? PhotoSizeSourceDialogPhotoSmall::class
                         : PhotoSizeSourceDialogPhotoBig::class;
                     $photoSizeSource = new $clazz(
-                        unpackLong($read(8)),
-                        unpackLong($read(8))
+                        Tools::unpackLong($read(8)),
+                        Tools::unpackLong($read(8))
                     );
 
-                    $volume_id = unpackLong($read(8));
-                    $local_id = unpackInt($read(4));
+                    $volume_id = Tools::unpackLong($read(8));
+                    $local_id = Tools::unpackInt($read(4));
                     break;
                 case PhotoSizeSourceType::STICKERSET_THUMBNAIL_LEGACY:
                     $photoSizeSource = new PhotoSizeSourceStickersetThumbnail(
-                        unpackLong($read(8)),
-                        unpackLong($read(8)),
+                        Tools::unpackLong($read(8)),
+                        Tools::unpackLong($read(8)),
                     );
 
-                    $volume_id = unpackLong($read(8));
-                    $local_id = unpackInt($read(4));
+                    $volume_id = Tools::unpackLong($read(8));
+                    $local_id = Tools::unpackInt($read(4));
                     break;
                 case PhotoSizeSourceType::STICKERSET_THUMBNAIL_VERSION:
                     $photoSizeSource = new PhotoSizeSourceStickersetThumbnailVersion(
-                        unpackLong($read(8)),
-                        unpackLong($read(8)),
-                        unpackInt($read(4))
+                        Tools::unpackLong($read(8)),
+                        Tools::unpackLong($read(8)),
+                        Tools::unpackInt($read(4))
                     );
                     break;
             }
@@ -253,25 +253,25 @@ final class FileId
     {
         $type = $this->type->value;
         if ($this->fileReference !== null) {
-            $type |= FILE_REFERENCE_FLAG;
+            $type |= Tools::FILE_REFERENCE_FLAG;
         }
         if ($this->url !== null) {
-            $type |= WEB_LOCATION_FLAG;
+            $type |= Tools::WEB_LOCATION_FLAG;
         }
 
         $fileId = \pack('VV', $type, $this->dcId);
         if ($this->fileReference !== null) {
-            $fileId .= packTLString($this->fileReference);
+            $fileId .= Tools::packTLString($this->fileReference);
         }
         if ($this->url !== null) {
-            $fileId .= packTLString($this->url);
-            $fileId .= packLong($this->accessHash);
-            return base64urlEncode(rleEncode($fileId));
+            $fileId .= Tools::packTLString($this->url);
+            $fileId .= Tools::packLong($this->accessHash);
+            return Tools::base64urlEncode(Tools::rleEncode($fileId));
         }
 
         \assert($this->id !== null);
-        $fileId .= packLong($this->id);
-        $fileId .= packLong($this->accessHash);
+        $fileId .= Tools::packLong($this->id);
+        $fileId .= Tools::packLong($this->accessHash);
 
         if ($this->photoSizeSource !== null) {
             $photoSize = $this->photoSizeSource;
@@ -281,11 +281,11 @@ final class FileId
                     if ($this->volumeId === null) {
                         $writeExtra = true;
                         $fileId .= \pack('V', PhotoSizeSourceType::LEGACY->value);
-                        $fileId .= packLong($photoSize->secret);
+                        $fileId .= Tools::packLong($photoSize->secret);
                     } else {
                         $fileId .= \pack('V', PhotoSizeSourceType::FULL_LEGACY->value);
-                        $fileId .= packLong($this->volumeId);
-                        $fileId .= packLong($photoSize->secret);
+                        $fileId .= Tools::packLong($this->volumeId);
+                        $fileId .= Tools::packLong($photoSize->secret);
                         $fileId .= \pack('l', $this->localId);
                     }
                     break;
@@ -307,22 +307,22 @@ final class FileId
                             : PhotoSizeSourceType::DIALOGPHOTO_BIG->value
                         )
                     );
-                    $fileId .= packLong($photoSize->dialogId);
-                    $fileId .= packLong($photoSize->dialogAccessHash);
+                    $fileId .= Tools::packLong($photoSize->dialogId);
+                    $fileId .= Tools::packLong($photoSize->dialogAccessHash);
                     break;
                 case $photoSize instanceof PhotoSizeSourceStickersetThumbnail:
                     $writeExtra = $this->volumeId !== null;
-                    $fileId .= packLong($photoSize->stickerSetId);
-                    $fileId .= packLong($photoSize->stickerSetAccessHash);
+                    $fileId .= Tools::packLong($photoSize->stickerSetId);
+                    $fileId .= Tools::packLong($photoSize->stickerSetAccessHash);
                     break;
                 case $photoSize instanceof PhotoSizeSourceStickersetThumbnailVersion:
-                    $fileId .= packLong($photoSize->stickerSetId);
-                    $fileId .= packLong($photoSize->stickerSetAccessHash);
+                    $fileId .= Tools::packLong($photoSize->stickerSetId);
+                    $fileId .= Tools::packLong($photoSize->stickerSetAccessHash);
                     $fileId .= \pack('l', $photoSize->stickerSetVersion);
                     break;
             }
             if ($writeExtra && $this->volumeId !== null && $this->localId !== null) {
-                $fileId .= packLong($this->volumeId);
+                $fileId .= Tools::packLong($this->volumeId);
                 $fileId .= \pack('l', $this->localId);
             }
         }
@@ -332,7 +332,7 @@ final class FileId
         }
         $fileId .= \chr($this->version);
 
-        return base64urlEncode(rleEncode($fileId));
+        return Tools::base64urlEncode(Tools::rleEncode($fileId));
     }
 
     /**

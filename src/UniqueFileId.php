@@ -93,26 +93,26 @@ final class UniqueFileId
     {
         $fileId = \pack('V', $this->type->value);
         if ($this->url !== null) {
-            $fileId .= packTLString($this->url);
+            $fileId .= Tools::packTLString($this->url);
         } elseif ($this->type === UniqueFileIdType::PHOTO) {
             if ($this->volumeId !== null) {
-                $fileId .= packLong($this->volumeId);
+                $fileId .= Tools::packLong($this->volumeId);
                 $fileId .= \pack('l', $this->localId);
             } elseif ($this->stickerSetId !== null) {
                 \assert($this->subType !== null);
                 $fileId .= \chr($this->subType);
-                $fileId .= packLong($this->stickerSetId);
+                $fileId .= Tools::packLong($this->stickerSetId);
                 $fileId .= \pack('l', $this->stickerSetVersion);
             } else {
                 \assert($this->subType !== null && $this->id !== null);
-                $fileId .= packLong($this->id);
+                $fileId .= Tools::packLong($this->id);
                 $fileId .= \chr($this->subType);
             }
         } elseif ($this->id !== null) {
-            $fileId .= packLong($this->id);
+            $fileId .= Tools::packLong($this->id);
         }
 
-        return base64urlEncode(rleEncode($fileId));
+        return Tools::base64urlEncode(Tools::rleEncode($fileId));
     }
 
     /**
@@ -124,7 +124,7 @@ final class UniqueFileId
     public static function fromUniqueBotAPI(string $fileId): self
     {
         $orig = $fileId;
-        $fileId = rleDecode(base64urlDecode($fileId));
+        $fileId = Tools::rleDecode(Tools::base64urlDecode($fileId));
 
         /** @var int */
         $typeId = \unpack('V', $fileId)[1];
@@ -144,26 +144,26 @@ final class UniqueFileId
             \fwrite($res, $fileId);
             \fseek($res, 0);
             $fileId = $res;
-            $url = readTLString($fileId);
+            $url = Tools::readTLString($fileId);
 
             $l = \fstat($fileId)['size'] - \ftell($fileId);
             \trigger_error("Unique file ID $orig has $l bytes of leftover data");
         } elseif (\strlen($fileId) === 12) {
             // Legacy photos
-            $volume_id = unpackLong(\substr($fileId, 0, 8));
-            $local_id = unpackInt(\substr($fileId, 8));
+            $volume_id = Tools::unpackLong(\substr($fileId, 0, 8));
+            $local_id = Tools::unpackInt(\substr($fileId, 8));
         } elseif (\strlen($fileId) === 9) {
             // Dialog photos/thumbnails
-            $id = unpackLong($fileId);
+            $id = Tools::unpackLong($fileId);
             $subType = \ord($fileId[8]);
         } elseif (\strlen($fileId) === 13) {
             // Stickerset ID/version
             $subType = \ord($fileId[0]);
-            $sticker_set_id = unpackLong(\substr($fileId, 1, 8));
-            $sticker_set_version = unpackInt(\substr($fileId, 9));
+            $sticker_set_id = Tools::unpackLong(\substr($fileId, 1, 8));
+            $sticker_set_version = Tools::unpackInt(\substr($fileId, 9));
         } elseif (\strlen($fileId) === 8) {
             // Any other document
-            $id = unpackLong($fileId);
+            $id = Tools::unpackLong($fileId);
         } else {
             $l = \strlen($fileId);
             \trigger_error("Unique file ID $orig has $l bytes of leftover data");
