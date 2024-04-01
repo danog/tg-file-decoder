@@ -6,14 +6,13 @@ use CURLFile;
 use danog\Decoder\FileId;
 use danog\Decoder\FileIdType;
 use danog\Decoder\UniqueFileId;
+use PHPUnit\Framework\Attributes\DataProvider;
 use PHPUnit\Framework\TestCase;
 
 /** @api */
 class IntegrationTest extends TestCase
 {
-    /**
-     * @dataProvider provideFileIdsAndType
-     */
+    #[DataProvider('provideFileIdsAndType')]
     public function testAll(FileIdType $type, string $fileIdStr, string $uniqueFileIdStr): void
     {
         $fileId = FileId::fromBotAPI($fileIdStr);
@@ -29,7 +28,7 @@ class IntegrationTest extends TestCase
     }
 
     /** @psalm-suppress MixedArrayAccess, MixedAssignment, PossiblyInvalidArgument, MixedArgument */
-    public function provideFileIdsAndType(): \Generator
+    public static function provideFileIdsAndType(): \Generator
     {
         foreach (['CAADBAADwwADmFmqDf6xBrPTReqHFgQ', 'CAACAgQAAxkBAAIC4l9CWDGzVUcDejU0TETLWbOdfsCoAALDAAOYWaoN_rEGs9NF6ocbBA', 'CAADBAADwwADmFmqDf6xBrPTReqHAg'] as $fileId) {
             yield [
@@ -41,7 +40,7 @@ class IntegrationTest extends TestCase
 
         $dest = \getenv('DEST');
         $token = \getenv('TOKEN');
-        foreach ($this->provideChats() as $chat) {
+        foreach (self::provideChats() as $chat) {
             /**
              * @var array{
              *      small_file_id: string,
@@ -62,7 +61,7 @@ class IntegrationTest extends TestCase
                 $result['big_file_unique_id'],
             ];
         }
-        foreach ($this->provideUrls() as $type => $url) {
+        foreach (self::provideUrls() as $type => $url) {
             if ($type === 'video_note') {
                 \copy($url, \basename($url));
 
@@ -104,11 +103,11 @@ class IntegrationTest extends TestCase
      * @psalm-suppress InvalidReturnStatement, InvalidReturnType
      * @return list<string>
      */
-    public function provideChats(): array
+    public static function provideChats(): array
     {
         return [\getenv('DEST'), '@MadelineProto'];
     }
-    public function provideUrls(): array
+    public static function provideUrls(): array
     {
         return [
             'sticker' => 'https://github.com/danog/MadelineProto/raw/v8/tests/lel.webp?raw=true',
