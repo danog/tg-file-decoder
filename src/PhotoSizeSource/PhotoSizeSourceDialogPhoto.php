@@ -28,8 +28,8 @@ use danog\Decoder\PhotoSizeSource;
 abstract class PhotoSizeSourceDialogPhoto extends PhotoSizeSource
 {
     public function __construct(
-        public readonly int $dialogId,
-        public readonly int $dialogAccessHash,
+        public int $dialogId,
+        public int $dialogAccessHash,
     ) {
     }
     /**

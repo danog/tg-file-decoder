@@ -33,12 +33,12 @@ final class PhotoSizeSourceThumbnail extends PhotoSizeSource
          * File type of original file.
          *
          */
-        public readonly FileIdType $thumbFileType,
+        public FileIdType $thumbFileType,
         /**
          * Thumbnail size.
          *
          */
-        public readonly string $thumbType,
+        public string $thumbType,
     ) {
     }
 }

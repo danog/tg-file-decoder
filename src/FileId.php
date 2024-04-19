@@ -41,64 +41,64 @@ final class FileId
          * DC ID.
          *
          */
-        public readonly int $dcId,
+        public int $dcId,
 
         /**
          * File type.
          *
          */
-        public readonly FileIdType $type,
+        public FileIdType $type,
 
         /**
          * File id.
          *
          */
-        public readonly ?int $id,
+        public ?int $id,
         /**
          * File access hash.
          *
          */
-        public readonly int $accessHash,
+        public int $accessHash,
 
         /**
          * Photo size source.
          *
          */
-        public readonly ?PhotoSizeSource $photoSizeSource = null,
+        public ?PhotoSizeSource $photoSizeSource = null,
 
         /**
          * Photo volume ID.
          *
          */
-        public readonly ?int $volumeId = null,
+        public ?int $volumeId = null,
         /**
          * Photo local ID.
          *
          */
-        public readonly ?int $localId = null,
+        public ?int $localId = null,
 
         /**
          * File reference.
          *
          */
-        public readonly ?string $fileReference = null,
+        public ?string $fileReference = null,
         /**
          * File URL for weblocation.
          *
          */
-        public readonly ?string $url = null,
+        public ?string $url = null,
 
         /**
          * Bot API file ID version.
          *
          */
-        public readonly int $version = 4,
+        public int $version = 4,
 
         /**
          * Bot API file ID subversion.
          *
          */
-        public readonly int $subVersion = 47,
+        public int $subVersion = 47,
     ) {
     }
 

@@ -28,7 +28,7 @@ use danog\Decoder\PhotoSizeSource;
 final class PhotoSizeSourceLegacy extends PhotoSizeSource
 {
     public function __construct(
-        public readonly int $secret,
+        public int $secret,
     ) {
     }
 }

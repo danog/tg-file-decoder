@@ -37,42 +37,42 @@ final class UniqueFileId
          * File type.
          *
          */
-        public readonly UniqueFileIdType $type,
+        public UniqueFileIdType $type,
         /**
          * File ID.
          *
          */
-        public readonly ?int $id = null,
+        public ?int $id = null,
         /**
          * Photo subtype.
          *
          */
-        public readonly ?int $subType = null,
+        public ?int $subType = null,
         /**
          * Photo volume ID.
          *
          */
-        public readonly ?int $volumeId = null,
+        public ?int $volumeId = null,
         /**
          * Photo local ID.
          *
          */
-        public readonly ?int $localId = null,
+        public ?int $localId = null,
         /**
          * Sticker set ID.
          *
          */
-        public readonly ?int $stickerSetId = null,
+        public ?int $stickerSetId = null,
         /**
          * Sticker set version.
          *
          */
-        public readonly ?int $stickerSetVersion = null,
+        public ?int $stickerSetVersion = null,
         /**
          * Weblocation URL.
          *
          */
-        public readonly ?string $url= null,
+        public ?string $url= null,
     ) {
     }
 

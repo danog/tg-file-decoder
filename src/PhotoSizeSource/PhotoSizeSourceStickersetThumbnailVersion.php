@@ -32,17 +32,17 @@ final class PhotoSizeSourceStickersetThumbnailVersion extends PhotoSizeSource
          * Stickerset ID.
          *
          */
-        public readonly int $stickerSetId,
+        public int $stickerSetId,
         /**
          * Stickerset access hash.
          *
          */
-        public readonly int $stickerSetAccessHash,
+        public int $stickerSetAccessHash,
         /**
          * Stickerset version.
          *
          */
-        public readonly int $stickerSetVersion
+        public int $stickerSetVersion
     ) {
 
     }
