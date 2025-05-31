@@ -36,6 +36,10 @@ jobs:
           key: ${{ matrix.os }}-composer-${{ matrix.php-versions }}-${{ hashFiles('**/composer.lock') }}
           restore-keys: ${{ matrix.os }}-composer-${{ matrix.php-versions }}-
 
+      - name: Install dependencies
+        run: |
+          composer install --prefer-dist
+
       - name: Run codestyle check
         env:
           PHP_CS_FIXER_IGNORE_ENV: 1
