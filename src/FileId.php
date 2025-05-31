@@ -156,20 +156,17 @@ final class FileId
         if ($typeId <= FileIdType::PHOTO->toInnerID()) {
             if ($subVersion < 32) {
                 $volume_id = Tools::unpackLong($read(8));
-                $local_id = Tools::unpackInt($read(4));
             }
 
             /** @var int */
-            $arg = $subVersion >= 4 ? \unpack('V', $read(4))[1] : 0;
+            $arg = $subVersion >= 22 ? \unpack('V', $read(4))[1] : 0;
             $photosize_source = PhotoSizeSourceType::from($arg);
             switch ($photosize_source) {
                 case PhotoSizeSourceType::LEGACY:
                     $photoSizeSource = new PhotoSizeSourceLegacy(Tools::unpackLong($read(8)));
                     break;
                 case PhotoSizeSourceType::FULL_LEGACY:
-                    $volume_id = Tools::unpackLong($read(8));
                     $photoSizeSource = new PhotoSizeSourceLegacy(Tools::unpackLong($read(8)));
-                    $local_id = Tools::unpackInt($read(4));
                     break;
                 case PhotoSizeSourceType::THUMBNAIL:
                     /** @var array{file_type: int, thumbnail_type: string} */
@@ -205,8 +202,6 @@ final class FileId
                         Tools::unpackLong($read(8))
                     );
 
-                    $volume_id = Tools::unpackLong($read(8));
-                    $local_id = Tools::unpackInt($read(4));
                     break;
                 case PhotoSizeSourceType::STICKERSET_THUMBNAIL_LEGACY:
                     $photoSizeSource = new PhotoSizeSourceStickersetThumbnail(
@@ -214,8 +209,6 @@ final class FileId
                         Tools::unpackLong($read(8)),
                     );
 
-                    $volume_id = Tools::unpackLong($read(8));
-                    $local_id = Tools::unpackInt($read(4));
                     break;
                 case PhotoSizeSourceType::STICKERSET_THUMBNAIL_VERSION:
                     $photoSizeSource = new PhotoSizeSourceStickersetThumbnailVersion(
@@ -224,6 +217,9 @@ final class FileId
                         Tools::unpackInt($read(4))
                     );
                     break;
+            }
+            if ($photosize_source === PhotoSizeSourceType::FULL_LEGACY || ($subVersion >= 22 && $subVersion < 32)) {
+                $local_id = Tools::unpackInt($read(4));
             }
         }
         $l = \fstat($fileId)['size'] - \ftell($fileId);
@@ -276,54 +272,56 @@ final class FileId
 
         if ($this->photoSizeSource !== null) {
             $photoSize = $this->photoSizeSource;
-            $writeExtra = false;
+            if ($this->subVersion < 32) {
+                $fileId .= Tools::packLong($this->volumeId);
+            }
+
             switch (true) {
                 case $photoSize instanceof PhotoSizeSourceLegacy:
-                    if ($this->volumeId === null) {
-                        $writeExtra = true;
-                        $fileId .= \pack('V', PhotoSizeSourceType::LEGACY->value);
-                        $fileId .= Tools::packLong($photoSize->secret);
-                    } else {
-                        $fileId .= \pack('V', PhotoSizeSourceType::FULL_LEGACY->value);
-                        $fileId .= Tools::packLong($this->volumeId);
-                        $fileId .= Tools::packLong($photoSize->secret);
-                        $fileId .= \pack('l', $this->localId);
-                    }
+                    $fileId .= Tools::packLong($photoSize->secret);
                     break;
                 case $photoSize instanceof PhotoSizeSourceThumbnail:
-                    $fileId .= \pack('V', PhotoSizeSourceType::THUMBNAIL->value);
+                    if ($this->subVersion >= 22) {
+                        $fileId .= \pack('V', PhotoSizeSourceType::THUMBNAIL->value);
+                    }
                     $fileId .= \pack('Va4', $photoSize->thumbFileType->toInnerID(), $photoSize->thumbType);
                     break;
                 case $photoSize instanceof PhotoSizeSourceDialogPhoto:
-                    $fileId .= \pack(
-                        'V',
-                        ($writeExtra = $this->volumeId !== null) ?
-                        (
-                            $photoSize->isSmallDialogPhoto()
-                            ? PhotoSizeSourceType::DIALOGPHOTO_SMALL_LEGACY->value
-                            : PhotoSizeSourceType::DIALOGPHOTO_BIG_LEGACY->value
-                        ) : (
-                            $photoSize->isSmallDialogPhoto()
-                            ? PhotoSizeSourceType::DIALOGPHOTO_SMALL->value
-                            : PhotoSizeSourceType::DIALOGPHOTO_BIG->value
-                        )
-                    );
+                    if ($this->subVersion >= 22) {
+                        $fileId .= \pack(
+                            'V',
+                            $this->volumeId !== null ?
+                            (
+                                $photoSize->isSmallDialogPhoto()
+                                ? PhotoSizeSourceType::DIALOGPHOTO_SMALL_LEGACY->value
+                                : PhotoSizeSourceType::DIALOGPHOTO_BIG_LEGACY->value
+                            ) : (
+                                $photoSize->isSmallDialogPhoto()
+                                ? PhotoSizeSourceType::DIALOGPHOTO_SMALL->value
+                                : PhotoSizeSourceType::DIALOGPHOTO_BIG->value
+                            )
+                        );
+                    }
                     $fileId .= Tools::packLong($photoSize->dialogId);
                     $fileId .= Tools::packLong($photoSize->dialogAccessHash);
                     break;
                 case $photoSize instanceof PhotoSizeSourceStickersetThumbnail:
-                    $writeExtra = $this->volumeId !== null;
+                    if ($this->subVersion >= 22) {
+                        $fileId .= \pack('V', PhotoSizeSourceType::STICKERSET_THUMBNAIL->value);
+                    }
                     $fileId .= Tools::packLong($photoSize->stickerSetId);
                     $fileId .= Tools::packLong($photoSize->stickerSetAccessHash);
                     break;
                 case $photoSize instanceof PhotoSizeSourceStickersetThumbnailVersion:
+                    if ($this->subVersion >= 22) {
+                        $fileId .= \pack('V', PhotoSizeSourceType::STICKERSET_THUMBNAIL_VERSION->value);
+                    }
                     $fileId .= Tools::packLong($photoSize->stickerSetId);
                     $fileId .= Tools::packLong($photoSize->stickerSetAccessHash);
                     $fileId .= \pack('l', $photoSize->stickerSetVersion);
                     break;
             }
-            if ($writeExtra && $this->volumeId !== null && $this->localId !== null) {
-                $fileId .= Tools::packLong($this->volumeId);
+            if ($this->localId !== null) {
                 $fileId .= \pack('l', $this->localId);
             }
         }
