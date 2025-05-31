@@ -47,6 +47,9 @@ jobs:
           vendor/bin/php-cs-fixer --diff --dry-run -v fix
       
       - name: Run unit tests
+        env:
+          TOKEN: ${{ secrets.TOKEN }}
+          DEST: ${{ secrets.DEST }}
         run: |
           vendor/bin/phpunit --coverage-text --coverage-clover build/logs/clover.xml
 
