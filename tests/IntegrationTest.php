@@ -119,8 +119,8 @@ class IntegrationTest extends TestCase
             'video' => 'https://github.com/danog/MadelineProto/raw/v8/tests/swing.mp4?raw=true',
             'animation' => 'https://github.com/danog/MadelineProto/raw/v8/tests/pony.mp4?raw=true',
             'document' => 'https://github.com/danog/danog.github.io/raw/master/lol/index_htm_files/0.gif',
-            'voice' => 'https://daniil.it/audio_2020-02-01_18-09-08.ogg',
-            'video_note' => 'https://daniil.it/round.mp4'
+            'voice' => 'https://paste.daniil.it/a.ogg',
+            'video_note' => 'https://paste.daniil.it/round.mp4'
         ];
     }
 }
