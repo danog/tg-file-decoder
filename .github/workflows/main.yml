@@ -9,11 +9,11 @@ jobs:
     strategy:
       matrix:
         tag: ["amd64"]
-        php: ["8.2", "8.3"]
+        php: ["8.4"]
     name: PHP ${{ matrix.php }} Test on ${{ matrix.tag }}
     steps:
       - name: Checkout
-        uses: actions/checkout@v3
+        uses: actions/checkout@v4
 
       - name: Setup PHP
         # Inputs to manual.sh are in this order - php, extensions, ini-values, coverage, tools
