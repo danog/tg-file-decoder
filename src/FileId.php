@@ -273,6 +273,7 @@ final class FileId
         if ($this->photoSizeSource !== null) {
             $photoSize = $this->photoSizeSource;
             if ($this->subVersion < 32) {
+                assert($this->volumeId !== null);
                 $fileId .= Tools::packLong($this->volumeId);
             }
 

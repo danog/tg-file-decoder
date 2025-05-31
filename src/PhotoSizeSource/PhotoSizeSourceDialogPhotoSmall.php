@@ -29,6 +29,7 @@ final class PhotoSizeSourceDialogPhotoSmall extends PhotoSizeSourceDialogPhoto
      * Get whether the big or small version of the photo is being used.
      *
      */
+    #[\Override]
     public function isSmallDialogPhoto(): bool
     {
         return true;
